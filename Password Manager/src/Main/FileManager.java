@@ -2,10 +2,15 @@ package Main;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Class for managing db files, reading, writing, encrypting, decrypting
@@ -79,7 +84,7 @@ public class FileManager {
         return true;
     }
 
-    public String encrypt(String Data) throws Exception {
+    public String encrypt(String Data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Key key = generateKey(keyValue);
         Cipher c = Cipher.getInstance(ALGO);
         c.init(Cipher.ENCRYPT_MODE, key);
@@ -88,7 +93,7 @@ public class FileManager {
         return encryptedValue;
     }
 
-    public String decrypt(String encryptedData) throws Exception {
+    public String decrypt(String encryptedData) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
         Key key = generateKey(keyValue);
         Cipher c = Cipher.getInstance(ALGO);
         c.init(Cipher.DECRYPT_MODE, key);
@@ -99,7 +104,7 @@ public class FileManager {
     }
 
     //We use "generateKey()" method to generate a secret key for AES algorithm with a given key.
-    private Key generateKey(byte[] keyValue) throws Exception {
+    private Key generateKey(byte[] keyValue) {
         Key key = new SecretKeySpec(keyValue, ALGO);
         return key;
     }

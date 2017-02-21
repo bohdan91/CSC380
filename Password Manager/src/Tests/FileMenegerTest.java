@@ -2,10 +2,12 @@ package Tests;
 import Main.FileManager;
 import org.junit.*;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.File;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.io.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 
@@ -50,8 +52,8 @@ public class FileMenegerTest {
     }
 
     @Test
-    public void testEncryptDecrypt (){
-        try {
+    public void testEncryptDecrypt () throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, IOException {
+
             String send     = "testmessage123";
             String encoded  = file.encrypt(send);
 
@@ -61,9 +63,7 @@ public class FileMenegerTest {
 
             Assert.assertEquals(send, recieved);
 
-        } catch (Exception e){
-            Assert.fail();
-        }
+
     }
 
     @Test
