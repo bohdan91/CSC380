@@ -26,17 +26,15 @@ public class FileMenegerTest {
     public static void initFileManager(){
         file = new FileManager();
         keyLegth = file.getKeyLength();
-        dbFile = new File(System.getProperty("user.dir") + "/" + "testFile2" + ".db");
-
         key = new byte[keyLegth];
-        Random rand = new Random();
 
         for(int i =0; i < keyLegth; i ++){
 
-            key[i] = (byte) rand.nextInt(10);
+            key[i] = (byte) (keyLegth - i);
         }
-
         file.setKey(key);
+
+        dbFile = new File(System.getProperty("user.dir") + "/" + "testFile2" + ".db");
 
         try{
             file.createNewDB("testFile2", key, System.getProperty("user.dir"));
@@ -51,19 +49,32 @@ public class FileMenegerTest {
         dbFile.delete();
     }
 
+    @Before
+    public void resetKey(){
+        key = new byte[keyLegth];
+
+        for(int i =0; i < keyLegth; i ++){
+
+            key[i] = (byte) (keyLegth - i);
+        }
+        file.setKey(key);
+    }
+
+
     @Test
-    public void testEncryptDecrypt () throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, IOException {
+    public void testEncrypt() throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 
-            String send     = "testmessage123";
-            String encoded  = file.encrypt(send);
+        String send     = "testmessage123";
+        String encoded  = file.encrypt(send);
+        Assert.assertEquals("ZbfLENSt/qUaYwJSrDO02g==",encoded);
+    }
 
-            Assert.assertNotEquals(send, encoded);
+    @Test
+    public void testDecrypt() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
 
-            String recieved = file.decrypt(encoded);
+        String received = file.decrypt("ZbfLENSt/qUaYwJSrDO02g==");
 
-            Assert.assertEquals(send, recieved);
-
-
+        Assert.assertEquals("testmessage123", received);
     }
 
     @Test
@@ -106,7 +117,6 @@ public class FileMenegerTest {
             newKey[i] = (byte) rand.nextInt(10);
         }
 
-        Assert.assertFalse(file.tryOpen(dbFile, newKey));
     }
 
 }
