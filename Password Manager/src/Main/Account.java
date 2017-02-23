@@ -103,12 +103,5 @@ public class Account implements Serializable {
 
     public void setMaskedPassword(String maskedPassword) {
         this.maskedPassword = maskedPassword;
-<<<<<<< HEAD
     }
 }
-=======
-
-
-    }
-}
->>>>>>> origin/master

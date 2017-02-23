@@ -3,18 +3,18 @@ package Main;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-<<<<<<< HEAD
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-=======
+
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
->>>>>>> origin/master
+
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -25,6 +25,8 @@ import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+
+import static com.sun.tools.doclets.formats.html.markup.HtmlStyle.title;
 
 /**
  * Created by Bohdan on 2/22/17.
@@ -41,6 +43,10 @@ public class MainWindowController {
     @FXML private TableColumn urlColumn;
     @FXML private TableColumn noteColumn;
           private Stage addWindow;
+
+          public static Account accountToAdd;
+
+
 
     //Constructor
     @FXML
@@ -71,6 +77,13 @@ public class MainWindowController {
             addWindow.setTitle("Add Account");
             addWindow.setScene(mainScene);
             addWindow.showAndWait();
+
+            if(accountToAdd != null){
+                data.add(accountToAdd);
+                table.setItems(data);
+                accountToAdd = null;
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -104,6 +117,9 @@ public class MainWindowController {
         clipboard.setContent(content);
 
     }
+
+
+
 
 }
 
