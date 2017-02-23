@@ -3,10 +3,18 @@ package Main;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+<<<<<<< HEAD
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+=======
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+>>>>>>> origin/master
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -73,10 +81,27 @@ public class MainWindowController {
         Account selected = (Account)table.getSelectionModel().getSelectedItem();
         System.out.println(selected.getUserName());
         loadBar.setProgress(0.6);
+
+        //copying username to clipboard
+        String copyUsername = selected.getUserName();
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        content.putString(copyUsername);
+        clipboard.setContent(content);
+
     }
 
     @FXML
-    private void copyPassPressed(){
+    private void copyPassPressed() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+        Account selected = (Account)table.getSelectionModel().getSelectedItem();
+        System.out.println(selected.getPassword());
+
+        //copying password to clipboard
+        String copyPassword = selected.getPassword();
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        content.putString(copyPassword);
+        clipboard.setContent(content);
 
     }
 
