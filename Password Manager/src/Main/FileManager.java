@@ -56,6 +56,7 @@ public class FileManager {
             br.close();
         } catch(Exception e){
             System.err.println(e);
+            return false;
         }
         return false;
     }
