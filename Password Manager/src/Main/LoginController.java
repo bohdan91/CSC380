@@ -1,6 +1,8 @@
 package Main;
 
 import java.io.File;
+import java.io.IOException;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -33,6 +35,7 @@ public class LoginController {
     private Stage fileWindow;
     private Stage newFileWindow;
     private Scene createPanel;
+    private Stage MainWindow;
     private File  file;
 
     @FXML
@@ -44,6 +47,22 @@ public class LoginController {
             invalidLabel.setText("Logged In!");
             invalidLabel.setTextFill(Color.LIGHTGREEN);
             invalidLabel.setVisible(true);
+
+            //Close Login Window
+            Stage stage = (Stage) openBtn.getScene().getWindow();
+            stage.close();
+
+            //Open Main Window
+            this.MainWindow = new Stage();
+            try {
+                AnchorPane pane = FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
+                Scene mainScene = new Scene(pane);
+                MainWindow.setTitle("Password Manager");
+                MainWindow.setScene(mainScene);
+                MainWindow.showAndWait();
+            } catch(IOException e){
+                e.printStackTrace();
+            }
 
         }else{
             passField.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
@@ -91,6 +110,7 @@ public class LoginController {
 
 
    }
+
 
     @FXML
     private void createBtnPressed(){
