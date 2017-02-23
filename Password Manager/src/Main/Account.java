@@ -13,8 +13,8 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Created by Bohdan on 2/21/17.
  */
-public class Account implements Serializable {
 
+public class Account implements Serializable {
 
 
     private String title;
@@ -37,7 +37,7 @@ public class Account implements Serializable {
 
     private String maskPass(String password) {
         String output = "";
-        for(int i = 0; i < password.length(); i++) {
+        for (int i = 0; i < password.length(); i++) {
             output += "*";
         }
         return output;
@@ -97,6 +97,7 @@ public class Account implements Serializable {
 
     public void setMaskedPassword(String maskedPassword) {
         this.maskedPassword = maskedPassword;
-    }
 
+
+    }
 }
