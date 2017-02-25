@@ -8,7 +8,7 @@ import java.util.TreeSet;
  */
 public class AccountTable
 {
-    HashMap<String, Account> acountTable;
+    HashMap<String, Account> accountTable;
 
     public AccountTable()
     {
@@ -18,6 +18,11 @@ public class AccountTable
     public void put(String name, Account user)
     {
         accountTable.put(name, user);
+    }
+    
+    public Account get(String name)
+    {
+    	accountTable.get(name);
     }
 
     public boolean contains(String name)
@@ -48,7 +53,7 @@ public class AccountTable
     public Set typeSet(String type)
     {
         TreeSet<String> set = new TreeSet<>();
-        for (String s : accountTable.keySet)
+        for (String s : accountTable.keySet())
         {
             if (accountTable.get(s).getType().equals(type));
                 set.add(s);
