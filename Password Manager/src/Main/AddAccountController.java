@@ -41,6 +41,7 @@ public class AddAccountController {
         //close the window
         Stage sc = (Stage)title.getScene().getWindow();
         sc.close();
-
     }
+
+
 }
