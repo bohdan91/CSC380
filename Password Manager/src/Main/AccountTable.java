@@ -22,12 +22,13 @@ public class AccountTable
     
     public Account get(String name)
     {
-    	accountTable.get(name);
+    	return accountTable.get(name);
+
     }
 
     public boolean contains(String name)
     {
-        return accountTable.contatins(name);
+        return accountTable.containsKey(name);
     }
 
     public void remove(String name)
@@ -43,9 +44,9 @@ public class AccountTable
     public Set alphaSet()
     {
         TreeSet<String> set = new TreeSet<>();
-        for (String s : accountTable.keySet)
+        for (String s : accountTable.keySet())
         {
-            tree.add(s);
+            set.add(s);
         }
         return set;
     }
@@ -58,5 +59,6 @@ public class AccountTable
             if (accountTable.get(s).getType().equals(type));
                 set.add(s);
         }
+        return set;
     }
 }
