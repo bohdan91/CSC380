@@ -34,7 +34,10 @@ public class Account implements Serializable {
     public Account(String title, String userName, String password, String comment, String type, String URL) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
         this.title = title;
         this.userName = userName;
+
+
         this.password = Main.fileManager.encrypt(password);
+
         maskedPassword = maskPass(this.password);
         this.comment = comment;
         this.type = type;

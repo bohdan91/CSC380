@@ -1,4 +1,5 @@
 package Main;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
@@ -6,8 +7,11 @@ import java.util.TreeSet;
 /**
  * Created by Alex Voytovich on 2/21/2017
  */
-public class AccountTable{
-	
+
+
+public class AccountTable implements Serializable
+{
+
     HashMap<String, Account> accountTable;
 
     public AccountTable(){

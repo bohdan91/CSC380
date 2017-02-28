@@ -20,12 +20,30 @@ public class AccountTablePutTest{
 	Account bc;
 	Account cc;
 	FileManager manage;
-	
+
+	@BeforeClass
+    public static void init(){
+        Main.fileManager = new FileManager();
+	    String password = "mysecretpassword";
+        byte[] passUnFormatted = password.getBytes();
+        byte[] passFormatted = new byte[Main.fileManager.getKeyLength()];
+        int c =0;
+        for(int i = 0; i < Main.fileManager.getKeyLength(); i ++)
+        {
+            if(password.length() > c){
+                passFormatted[i] = passUnFormatted[c];
+                c++;
+            } else {
+                c = 0;
+            }
+        }
+        Main.fileManager.setKey(passFormatted);
+    }
+
     @Test
     public void testCreation()
     throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, 
     NoSuchAlgorithmException, NoSuchPaddingException{
-        Main.fileManager = new FileManager();
     	table = new AccountTable();
         ac = new Account("Email", "darking271", "123456", "My Email", "Email", "Gmail.com");
         bc = new Account("Bank", "avoytovich", "123123","My Bank Account", "Banking", "Chase.com");

@@ -23,6 +23,7 @@ public class FileManager {
     private File dbFile;
     private String controlKey = "abc123";
     private byte[] keyValue;
+    private AccountTable accountTable;
 
     public FileManager(){
 
@@ -48,17 +49,14 @@ public class FileManager {
             String result = decrypt(control);
             System.out.println(result);
 
-            if(result.equals(controlKey)){
-                br.close();
-                return true;
-            }
+
 
             br.close();
+            return true;
         } catch(Exception e){
             System.err.println(e);
             return false;
         }
-        return false;
     }
 
     public boolean createNewDB(String name, byte[] pas, String path){
@@ -117,4 +115,11 @@ public class FileManager {
     public int getKeyLength(){
         return keyLength;
     }
+
+    public boolean save(){
+
+        return true;
+    }
+
 }
+
