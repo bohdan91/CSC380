@@ -11,6 +11,9 @@ import java.io.*;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.math.BigInteger;
+
 
 /**
  * Class for managing db files, reading, writing, encrypting, decrypting
@@ -23,7 +26,8 @@ public class FileManager {
     private File dbFile;
     private String controlKey = "abc123";
     private byte[] keyValue;
-    private AccountTable accountTable;
+    private String uniqueId;
+
 
     public FileManager(){
 
@@ -61,6 +65,8 @@ public class FileManager {
 
     public boolean createNewDB(String name, byte[] pas, String path){
         keyValue = new byte[keyLength];
+        SecureRandom random = new SecureRandom();
+        uniqueId = new BigInteger(160, random).toString(32);
         int c = 0;
         for(int i = 0; i < keyLength; i ++)
         {
@@ -102,6 +108,10 @@ public class FileManager {
         return decryptedValue;
     }
 
+    public void populateTable(){
+
+    }
+
     //We use "generateKey()" method to generate a secret key for AES algorithm with a given key.
     private Key generateKey(byte[] keyValue) {
         Key key = new SecretKeySpec(keyValue, ALGO);
@@ -116,9 +126,27 @@ public class FileManager {
         return keyLength;
     }
 
+    /**
+     * Saving accounts to the file
+     * first line unique identifier
+     * every other line -> account formatted "title/userName/password/note/type/url"
+     * @return
+     */
     public boolean save(){
+        try {
+            PrintWriter out = new PrintWriter(dbFile, "UTF-8");
 
-        return true;
+            out.println(uniqueId);
+
+            for(Account ac : Main.accountTable.values()){
+                out.println(ac.getTitle() + "/" + ac.getUserName() + "/" + ac.getPassword() + "/" + ac.getComment() + "/" + ac.getType() + "/" + ac.getURL());
+            }
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

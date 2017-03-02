@@ -9,6 +9,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import java.util.HashMap;
+
 /**
  * Main class for setting up and starting an application,
  * display login window
@@ -19,6 +21,7 @@ public class Main extends Application {
     private Stage loginWindow;
     private Scene loginScene;
     public static FileManager fileManager;
+    public static HashMap<String, Account> accountTable;
 
     /**
      * Method that runs javaFX first login window
@@ -47,6 +50,7 @@ public class Main extends Application {
      */
     public static void main(String[] args) {
         fileManager = new FileManager();
+        accountTable = new HashMap<>();
         launch(args);
     }
 }

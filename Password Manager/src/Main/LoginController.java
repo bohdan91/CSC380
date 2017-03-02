@@ -51,6 +51,7 @@ public class LoginController {
             //Close Login Window
             Stage stage = (Stage) openBtn.getScene().getWindow();
             stage.close();
+            Main.fileManager.populateTable();
 
             //Open Main Window
             this.MainWindow = new Stage();
@@ -73,6 +74,7 @@ public class LoginController {
         }
 
     }
+
 
     @FXML
    private void openFilePressed(){

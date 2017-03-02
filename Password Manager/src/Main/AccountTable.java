@@ -9,7 +9,7 @@ import java.util.TreeSet;
  */
 
 
-public class AccountTable implements Serializable
+public class AccountTable
 {
 
     HashMap<String, Account> accountTable;
