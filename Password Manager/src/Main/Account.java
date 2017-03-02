@@ -30,18 +30,57 @@ public class Account implements Serializable {
     private String comment;
     private String type;
     private String URL;
+    private long lastModified;
 
+    /**
+     * Contrunctor for new account
+     * @param title
+     * @param userName
+     * @param password
+     * @param comment
+     * @param type
+     * @param URL
+     * @throws IllegalBlockSizeException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     */
     public Account(String title, String userName, String password, String comment, String type, String URL) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
         this.title = title;
         this.userName = userName;
-
-
         this.password = Main.fileManager.encrypt(password);
-
         maskedPassword = maskPass(this.password);
         this.comment = comment;
         this.type = type;
         this.URL = URL;
+        this.lastModified = System.currentTimeMillis();
+    }
+
+    /**
+     * Constructor for loading account
+     * @param title
+     * @param userName
+     * @param password
+     * @param comment
+     * @param type
+     * @param URL
+     * @param lastModified
+     * @throws IllegalBlockSizeException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     */
+    public Account(String title, String userName, String password, String comment, String type, String URL, long lastModified) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
+        this.title = title;
+        this.userName = userName;
+        this.password = password;
+        maskedPassword = maskPass(this.password);
+        this.comment = comment;
+        this.type = type;
+        this.URL = URL;
+        this.lastModified = lastModified;
     }
 
     private String maskPass(String password) {
@@ -66,6 +105,7 @@ public class Account implements Serializable {
 
     public void setPassword(String password) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
         this.password = Main.fileManager.encrypt(password);
+        lastModified = System.currentTimeMillis();
     }
 
     public String getComment() {
@@ -74,6 +114,7 @@ public class Account implements Serializable {
 
     public void setComment(String comment) {
         this.comment = comment;
+        lastModified = System.currentTimeMillis();
     }
 
     public String getType() {
@@ -82,6 +123,8 @@ public class Account implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+        lastModified = System.currentTimeMillis();
+
     }
 
     public String getURL() {
@@ -90,6 +133,8 @@ public class Account implements Serializable {
 
     public void setURL(String URL) {
         this.URL = URL;
+        lastModified = System.currentTimeMillis();
+
     }
 
     public String getTitle() {
@@ -98,6 +143,8 @@ public class Account implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+        lastModified = System.currentTimeMillis();
+
     }
 
     public String getMaskedPassword() {
@@ -106,5 +153,11 @@ public class Account implements Serializable {
 
     public void setMaskedPassword(String maskedPassword) {
         this.maskedPassword = maskedPassword;
+    }
+    public String getEncryptedPassword(){
+        return this.password;
+    }
+    public long getLastModified(){
+        return lastModified;
     }
 }

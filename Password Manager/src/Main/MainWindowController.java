@@ -58,10 +58,16 @@ public class MainWindowController {
         //Defining Table Data in an Observable List
         data  = FXCollections.observableArrayList();
 
-        Account testAccount = new Account("gmail1","username1", "password1", "comment1", "type1","gmail.com1");
+        /*Account testAccount = new Account("gmail1","username1", "password1", "comment1", "type1","gmail.com1");
         Account testAccount2 = new Account("gmail2","username2", "password2", "comment2", "type","gmail.com2");
         data.add(testAccount);
         data.add(testAccount2);
+        */
+        for(Account ac : Main.accountTable.values()){
+
+            data.add(ac);
+
+        }
 
 
         table.setItems(data);
@@ -79,6 +85,7 @@ public class MainWindowController {
             addWindow.showAndWait();
 
             if(accountToAdd != null){
+                Main.accountTable.put(accountToAdd.getTitle(), accountToAdd);
                 data.add(accountToAdd);
                 table.setItems(data);
                 accountToAdd = null;
@@ -116,6 +123,11 @@ public class MainWindowController {
         content.putString(copyPassword);
         clipboard.setContent(content);
 
+    }
+
+    @FXML
+    private void saveFile(){
+        Main.fileManager.save();
     }
 
 

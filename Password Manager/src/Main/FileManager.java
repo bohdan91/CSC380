@@ -50,15 +50,16 @@ public class FileManager {
             dbFile = file;
 
             String control = br.readLine();
-            String result = decrypt(control);
-            System.out.println(result);
+            decrypt(control);
+
+            load();
 
 
 
             br.close();
             return true;
         } catch(Exception e){
-            System.err.println(e);
+            e.printStackTrace();
             return false;
         }
     }
@@ -80,7 +81,7 @@ public class FileManager {
         try{
             dbFile = new File(path + "/" + name + ".db");
             BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile));
-            bw.write(encrypt(controlKey));
+            bw.write(encrypt(uniqueId));
             bw.close();
         }catch (Exception e ) {
             System.err.println(e);
@@ -95,6 +96,7 @@ public class FileManager {
         c.init(Cipher.ENCRYPT_MODE, key);
         byte[] encVal = c.doFinal(Data.getBytes());
         String encryptedValue = new BASE64Encoder().encode(encVal);
+        System.out.println("encrypted: " + Data + " to: " + encryptedValue);
         return encryptedValue;
     }
 
@@ -129,23 +131,81 @@ public class FileManager {
     /**
      * Saving accounts to the file
      * first line unique identifier
-     * every other line -> account formatted "title/userName/password/note/type/url"
+     * every other line -> account formatted "title/userName/note/type/url/password/date"
      * @return
      */
     public boolean save(){
         try {
-            PrintWriter out = new PrintWriter(dbFile, "UTF-8");
-
-            out.println(uniqueId);
+            FileWriter fw = new FileWriter(dbFile);
+            BufferedWriter out = new BufferedWriter(fw);
+            System.out.println("Writess: " + uniqueId);
+            out.write(encrypt(uniqueId));
+            out.newLine();
 
             for(Account ac : Main.accountTable.values()){
-                out.println(ac.getTitle() + "/" + ac.getUserName() + "/" + ac.getPassword() + "/" + ac.getComment() + "/" + ac.getType() + "/" + ac.getURL());
+                String s = "/title=" +ac.getTitle() + "/username=" + ac.getUserName() + "/comment=" + ac.getComment() + "/type=" + ac.getType() + "/url=" + ac.getURL() + "/";
+                //s = encrypt(s);
+                s += "***" + ac.getEncryptedPassword();
+                s += "/time=" + ac.getLastModified();
+                System.out.println("Writes: " + s);
+                out.write(s);
+                out.newLine();
             }
 
+            out.close();
+            fw.close();
+            System.out.println("Saved");
             return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
+    }
+
+    public boolean load(){
+        try {
+            FileReader fr = new FileReader(dbFile);
+            BufferedReader in = new BufferedReader(fr);
+
+            this.uniqueId = decrypt(in.readLine());
+
+            String line = in.readLine();
+
+            while(line != null){
+                String s = line.substring(0, line.indexOf("***"));
+                s = decrypt(s);
+                System.out.println("s: "+ s);
+                String titile = s.substring(s.lastIndexOf("title="),s.indexOf("/", s.lastIndexOf("title=")));
+
+                System.out.println(titile);
+
+                String userName = s.substring(s.lastIndexOf("username="),s.indexOf("/", s.lastIndexOf("username=")));
+
+                System.out.println(userName);
+
+                String note  = s.substring(s.lastIndexOf("note="),s.indexOf("/", s.lastIndexOf("note=")));
+
+                String type = s.substring(s.lastIndexOf("type="),s.indexOf("/", s.lastIndexOf("type=")));
+
+                String url = s.substring(s.lastIndexOf("url="),s.indexOf("/", s.lastIndexOf("url=")));
+
+                String password = line.substring(line.lastIndexOf("***"), line.indexOf("/", line.lastIndexOf("***")));
+
+                long lastModified = Long.valueOf(line.substring(line.lastIndexOf("time="), line.indexOf("/",line.lastIndexOf("time=") )));
+
+                Account ac = new Account(titile, userName, password, note, type, url, lastModified);
+
+                Main.accountTable.put(titile, ac);
+
+                line = in.readLine();
+            }
+            in.close();
+            fr.close();
+
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
         return false;
     }
 

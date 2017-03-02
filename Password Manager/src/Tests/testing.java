@@ -8,6 +8,10 @@ import java.math.BigInteger;
  */
 public class testing {
     public static void main(String[] args) {
+
+        System.out.println(System.currentTimeMillis());
+        System.out.println(System.currentTimeMillis());
+
         SecureRandom random = new SecureRandom();
 
         System.out.println(new BigInteger(160, random).toString(32).length());
