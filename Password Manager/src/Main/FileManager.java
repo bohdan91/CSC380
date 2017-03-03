@@ -96,7 +96,6 @@ public class FileManager {
         c.init(Cipher.ENCRYPT_MODE, key);
         byte[] encVal = c.doFinal(Data.getBytes());
         String encryptedValue = new BASE64Encoder().encode(encVal);
-        System.out.println("encrypted: " + Data + " to: " + encryptedValue);
         return encryptedValue;
     }
 
@@ -138,23 +137,34 @@ public class FileManager {
         try {
             FileWriter fw = new FileWriter(dbFile);
             BufferedWriter out = new BufferedWriter(fw);
-            System.out.println("Writess: " + uniqueId);
+            //System.out.println("Writess: " + uniqueId);
             out.write(encrypt(uniqueId));
             out.newLine();
 
             for(Account ac : Main.accountTable.values()){
                 String s = "/title=" +ac.getTitle() + "/username=" + ac.getUserName() + "/comment=" + ac.getComment() + "/type=" + ac.getType() + "/url=" + ac.getURL() + "/";
-                //s = encrypt(s);
+                if(s.length() > 30){
+                    String t ="";
+                    int c = s.length() / 30;
+                    for(int i =0; i < c; i++){
+                            t += encrypt(s.substring(i * 30, (i + 1) * 30));
+                    }
+                    t += encrypt(s.substring(c * 30));
+                    s = t;
+
+                }else {
+                    s = encrypt(s);
+                }
                 s += "***" + ac.getEncryptedPassword();
-                s += "/time=" + ac.getLastModified();
-                System.out.println("Writes: " + s);
+                s += "/time=" + ac.getLastModified() + "/";
+                //System.out.println("Writes: " + s);
                 out.write(s);
                 out.newLine();
             }
 
             out.close();
             fw.close();
-            System.out.println("Saved");
+            //System.out.println("Saved");
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,24 +184,41 @@ public class FileManager {
             while(line != null){
                 String s = line.substring(0, line.indexOf("***"));
                 s = decrypt(s);
-                System.out.println("s: "+ s);
-                String titile = s.substring(s.lastIndexOf("title="),s.indexOf("/", s.lastIndexOf("title=")));
+                String t ="";
+                int c = s.length() / 30;
+                char replace = (int) 4;
+
+                for(int i = 0; i < s.length(); i++){
+                    //System.out.println(i + " " + (int)s.charAt(i));
+                    if((int)s.charAt(i) != 2){
+                        t += s.charAt(i);
+                    }else {
+                        System.out.println("found");
+                    }
+                }
+
+                s = t;
+
+
+                //System.out.println("s:"+ s);
+                //System.out.println(s.lastIndexOf("title=") + ", " + s.indexOf("/", s.lastIndexOf("title=")));
+                String titile = s.substring(s.lastIndexOf("title=") + 6,s.indexOf("/", s.lastIndexOf("title=")));
 
                 System.out.println(titile);
 
-                String userName = s.substring(s.lastIndexOf("username="),s.indexOf("/", s.lastIndexOf("username=")));
+                String userName = s.substring(s.lastIndexOf("username=") + 9,s.indexOf("/", s.lastIndexOf("username=")));
 
                 System.out.println(userName);
 
-                String note  = s.substring(s.lastIndexOf("note="),s.indexOf("/", s.lastIndexOf("note=")));
+                String note  = s.substring(s.lastIndexOf("comment=") + 8,s.indexOf("/", s.lastIndexOf("comment=")));
 
-                String type = s.substring(s.lastIndexOf("type="),s.indexOf("/", s.lastIndexOf("type=")));
+                String type = s.substring(s.lastIndexOf("type=") + 5,s.indexOf("/", s.lastIndexOf("type=")));
 
-                String url = s.substring(s.lastIndexOf("url="),s.indexOf("/", s.lastIndexOf("url=")));
+                String url = s.substring(s.lastIndexOf("url=") + 4,s.indexOf("/", s.lastIndexOf("url=")));
 
-                String password = line.substring(line.lastIndexOf("***"), line.indexOf("/", line.lastIndexOf("***")));
-
-                long lastModified = Long.valueOf(line.substring(line.lastIndexOf("time="), line.indexOf("/",line.lastIndexOf("time=") )));
+                String password = line.substring(line.lastIndexOf("***") + 3, line.indexOf("/", line.lastIndexOf("***")));
+                System.out.println(line);
+                long lastModified = Long.valueOf(line.substring(line.lastIndexOf("time=") + 5, line.indexOf("/",line.lastIndexOf("time=") )));
 
                 Account ac = new Account(titile, userName, password, note, type, url, lastModified);
 
