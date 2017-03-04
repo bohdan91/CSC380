@@ -43,8 +43,7 @@ public class MainWindowController {
           private Stage addWindow;
 
           public static Account accountToAdd;
-
-
+ 
 
     //Constructor
     @FXML
