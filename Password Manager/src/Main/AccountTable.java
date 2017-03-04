@@ -1,5 +1,5 @@
-package main;
-
+package Main;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
@@ -15,7 +15,7 @@ public class AccountTable
     HashMap<String, Account> accountTable;
 
     public AccountTable(){
-        accountTable = new HashMap();
+        accountTable = new HashMap<>();
     }
 
     public void put(String name, Account user){
@@ -44,7 +44,7 @@ public class AccountTable
     }
 
     public Set<String> alphaSet(){
-        TreeSet<String> set = new TreeSet();
+        TreeSet<String> set = new TreeSet<>();
         for (String s : accountTable.keySet()){
             set.add(s);
         }
@@ -52,7 +52,7 @@ public class AccountTable
     }
 
     public Set<String> typeSet(String type){
-        TreeSet<String> set = new TreeSet();
+        TreeSet<String> set = new TreeSet<>();
         for (String s : accountTable.keySet()){
             if (accountTable.get(s).getType().equals(type));
                 set.add(s);

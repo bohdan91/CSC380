@@ -1,5 +1,4 @@
-package main;
-
+package Main;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
@@ -14,7 +13,6 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.math.BigInteger;
-import org.json.simple.*;
 
 
 /**
@@ -144,7 +142,7 @@ public class FileManager {
             out.newLine();
 
             for(Account ac : Main.accountTable.values()){
-                String s = "~&~title=" +ac.getTitle() + "~&~username=" + ac.getUserName() + "~&~comment=" + ac.getComment() + "~&~type=" + ac.getType() + "~&~url=" + ac.getURL() + "~&~";
+                String s = "/title=" +ac.getTitle() + "/username=" + ac.getUserName() + "/comment=" + ac.getComment() + "/type=" + ac.getType() + "/url=" + ac.getURL() + "/";
                 if(s.length() > 30){
                     String t ="";
                     int c = s.length() / 30;
@@ -158,7 +156,7 @@ public class FileManager {
                     s = encrypt(s);
                 }
                 s += "***" + ac.getEncryptedPassword();
-                s += "~&~time=" + ac.getLastModified() + "~&~";
+                s += "/time=" + ac.getLastModified() + "/";
                 //System.out.println("Writes: " + s);
                 out.write(s);
                 out.newLine();
@@ -204,23 +202,23 @@ public class FileManager {
 
                 //System.out.println("s:"+ s);
                 //System.out.println(s.lastIndexOf("title=") + ", " + s.indexOf("/", s.lastIndexOf("title=")));
-                String titile = s.substring(s.lastIndexOf("title=") + 6,s.indexOf("~&~", s.lastIndexOf("title=")));
+                String titile = s.substring(s.lastIndexOf("title=") + 6,s.indexOf("/", s.lastIndexOf("title=")));
 
                 System.out.println(titile);
 
-                String userName = s.substring(s.lastIndexOf("username=") + 9,s.indexOf("~&~", s.lastIndexOf("username=")));
+                String userName = s.substring(s.lastIndexOf("username=") + 9,s.indexOf("/", s.lastIndexOf("username=")));
 
                 System.out.println(userName);
 
-                String note  = s.substring(s.lastIndexOf("comment=") + 8,s.indexOf("~&~", s.lastIndexOf("comment=")));
+                String note  = s.substring(s.lastIndexOf("comment=") + 8,s.indexOf("/", s.lastIndexOf("comment=")));
 
-                String type = s.substring(s.lastIndexOf("type=") + 5,s.indexOf("~&~", s.lastIndexOf("type=")));
+                String type = s.substring(s.lastIndexOf("type=") + 5,s.indexOf("/", s.lastIndexOf("type=")));
 
-                String url = s.substring(s.lastIndexOf("url=") + 4,s.indexOf("~&~", s.lastIndexOf("url=")));
+                String url = s.substring(s.lastIndexOf("url=") + 4,s.indexOf("/", s.lastIndexOf("url=")));
 
-                String password = line.substring(line.lastIndexOf("***") + 3, line.indexOf("~&~", line.lastIndexOf("***")));
+                String password = line.substring(line.lastIndexOf("***") + 3, line.indexOf("/", line.lastIndexOf("***")));
                 System.out.println(line);
-                long lastModified = Long.valueOf(line.substring(line.lastIndexOf("time=") + 5, line.indexOf("~&~",line.lastIndexOf("time=") )));
+                long lastModified = Long.valueOf(line.substring(line.lastIndexOf("time=") + 5, line.indexOf("/",line.lastIndexOf("time=") )));
 
                 Account ac = new Account(titile, userName, password, note, type, url, lastModified);
 

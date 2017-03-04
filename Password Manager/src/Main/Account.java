@@ -1,10 +1,17 @@
-package main;
+package Main;
+
+
+import javafx.beans.property.SimpleStringProperty;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.io.Serializable;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

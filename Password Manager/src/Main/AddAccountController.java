@@ -1,6 +1,7 @@
-package main;
+package Main;
 
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
@@ -26,6 +27,8 @@ public class AddAccountController {
     @FXML private TextField url;
     @FXML private ChoiceBox typeBox;
     @FXML private TextArea note;
+
+    //
 
 
     @FXML

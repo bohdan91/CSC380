@@ -1,4 +1,9 @@
-package java;
+package Tests;
+
+import Main.Account;
+import Main.AccountTable;
+import Main.FileManager;
+import Main.Main;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -7,10 +12,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import main.Account;
-import main.AccountTable;
-import main.FileManager;
-import main.Main;
 import org.junit.*;
 
 public class AccountTablePutTest{
