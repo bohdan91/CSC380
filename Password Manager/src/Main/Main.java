@@ -1,15 +1,12 @@
-
-package Main;
-
+package main;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
+
 
 /**
  * Main class for setting up and starting an application,
@@ -30,6 +27,7 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws Exception{
+        System.out.println(System.getProperty("user.dir"));
         AnchorPane pane = FXMLLoader.load(getClass().getResource("Login.fxml"));
         loginWindow = primaryStage;
 
@@ -50,7 +48,7 @@ public class Main extends Application {
      */
     public static void main(String[] args) {
         fileManager = new FileManager();
-        accountTable = new HashMap<>();
+        accountTable = new HashMap();
         launch(args);
     }
 }

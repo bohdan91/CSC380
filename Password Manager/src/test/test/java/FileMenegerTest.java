@@ -1,5 +1,6 @@
-package Tests;
-import Main.FileManager;
+package java;
+
+import main.FileManager;
 import org.junit.*;
 
 import javax.crypto.BadPaddingException;
