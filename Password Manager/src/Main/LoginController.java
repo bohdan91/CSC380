@@ -3,6 +3,7 @@ package Main;
 import java.io.File;
 import java.io.IOException;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -13,10 +14,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.stage.*;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -60,6 +58,12 @@ public class LoginController {
                 Scene mainScene = new Scene(pane);
                 MainWindow.setTitle("Password Manager");
                 MainWindow.setScene(mainScene);
+                //Save on-Close
+                MainWindow.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                    public void handle(WindowEvent we) {
+                        Main.fileManager.save();
+                    }
+                });
                 MainWindow.showAndWait();
             } catch(IOException e){
                 e.printStackTrace();
