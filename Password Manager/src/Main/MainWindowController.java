@@ -6,8 +6,6 @@ import javafx.fxml.FXML;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableColumn;
@@ -25,8 +23,6 @@ import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-
-import static com.sun.tools.doclets.formats.html.markup.HtmlStyle.title;
 
 /**
  * Created by Bohdan on 2/22/17.
@@ -128,6 +124,28 @@ public class MainWindowController {
     @FXML
     private void saveFile(){
         Main.fileManager.save();
+    }
+
+    @FXML
+    private void lockButtonPressed(){
+        try {
+
+            Stage stage = (Stage) table.getScene().getWindow();
+            stage.close();
+
+            Stage loginWindow = new Stage();
+            AnchorPane pane = FXMLLoader.load(getClass().getResource("Login.fxml"));
+
+            Scene loginScene = new Scene(pane);
+
+            loginWindow.setTitle("Password Manager");
+            loginWindow.setResizable(false);
+            loginWindow.setScene(loginScene);
+            loginWindow.show();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
 

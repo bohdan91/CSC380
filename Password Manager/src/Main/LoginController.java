@@ -6,7 +6,6 @@ import java.io.IOException;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,8 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
-
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class LoginController {
 
@@ -35,6 +32,17 @@ public class LoginController {
     private Scene createPanel;
     private Stage MainWindow;
     private File  file;
+
+    @FXML
+    public void initialize(){
+        File selectedFile = Main.fileManager.getDbFile();
+        if(selectedFile!= null){
+            passField.setDisable(false);
+            openBtn.setDisable(false);
+            promtLabel.setText("Enter the password: ");
+            this.file = selectedFile;
+        }
+    }
 
     @FXML
     private void openPressed(){

@@ -236,5 +236,9 @@ public class FileManager {
         return false;
     }
 
+    public File getDbFile(){
+        return dbFile;
+    }
+
 }
 
