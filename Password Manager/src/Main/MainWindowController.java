@@ -2,20 +2,21 @@ package Main;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -48,6 +49,40 @@ public class MainWindowController {
     @FXML
     public void initialize() throws InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, NoSuchPaddingException {
         table.setEditable(false);
+
+        final ContextMenu contextMenu = new ContextMenu();
+        /*contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent e) {
+                //System.out.println("showing");
+            }
+        });
+        contextMenu.setOnShown(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent e) {
+                //System.out.println("shown");
+            }
+        });
+        */
+
+        MenuItem item1 = new MenuItem("Copy Username");
+        item1.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                copyUsernamePressed();
+            }
+        });
+        MenuItem item2 = new MenuItem("Copy Password");
+        item2.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                try {
+                    copyPassPressed();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        contextMenu.getItems().addAll(item1, item2);
+
+        table.setContextMenu(contextMenu);
+
         statusPane.setBorder(new Border(new BorderStroke(Color.BLACK,
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
@@ -95,7 +130,6 @@ public class MainWindowController {
     @FXML
     private void copyUsernamePressed(){
         Account selected = (Account)table.getSelectionModel().getSelectedItem();
-        System.out.println(selected.getUserName());
         loadBar.setProgress(0.6);
 
         //copying username to clipboard
@@ -110,7 +144,6 @@ public class MainWindowController {
     @FXML
     private void copyPassPressed() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
         Account selected = (Account)table.getSelectionModel().getSelectedItem();
-        System.out.println(selected.getPassword());
 
         //copying password to clipboard
         String copyPassword = selected.getPassword();
