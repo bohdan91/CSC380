@@ -83,13 +83,14 @@ public class LoginController {
             invalidLabel.setTextFill(Color.RED);
             invalidLabel.setVisible(true);
             passField.requestFocus();
+            passField.selectAll();
         }
 
     }
 
 
     @FXML
-   private void openFilePressed(){
+    private void openFilePressed(){
         FileChooser chooser = new FileChooser();
         fileWindow = new Stage();
 
@@ -105,34 +106,34 @@ public class LoginController {
             promtLabel.setText("Enter the password: ");
             this.file = selectedFile;
         }
-   }
+    }
 
-   @FXML
+    @FXML
     private void newFilePressed(){
         this.newFileWindow = new Stage();
-       try {
-           AnchorPane pane = FXMLLoader.load(getClass().getResource("CreateDB.fxml"));
-           createPanel = new Scene(pane);
+        try {
+            AnchorPane pane = FXMLLoader.load(getClass().getResource("CreateDB.fxml"));
+            createPanel = new Scene(pane);
 
-           newFileWindow.setTitle("Create New DB");
-           newFileWindow.initModality(Modality.APPLICATION_MODAL);
-           newFileWindow.setScene(createPanel);
-           newFileWindow.showAndWait();
+            newFileWindow.setTitle("Create New DB");
+            newFileWindow.initModality(Modality.APPLICATION_MODAL);
+            newFileWindow.setScene(createPanel);
+            newFileWindow.showAndWait();
 
-       } catch (Exception e) {System.err.println(e);
-       e.printStackTrace();}
+        } catch (Exception e) {System.err.println(e);
+            e.printStackTrace();}
 
 
-   }
+    }
 
 
     @FXML
     private void createBtnPressed(){
-       //System.out.println("\""+createName.getText()+"\"");
-       passShortLabel.setVisible(false);
-       passShortLabel.setBorder(null);
-       createName.setBorder(null);
-       createPass.setBorder(null);
+        //System.out.println("\""+createName.getText()+"\"");
+        passShortLabel.setVisible(false);
+        passShortLabel.setBorder(null);
+        createName.setBorder(null);
+        createPass.setBorder(null);
 
         if(createName.getText().length() < 1){
             createName.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
@@ -148,31 +149,18 @@ public class LoginController {
             stage.close();
         }
 
-   }
+    }
 
-   @FXML
-   private void nameEnter(){
-       createPath.setText(System.getProperty("user.dir")+ "/" + createName.getText() + ".db");
-   }
+    @FXML
+    private void nameEnter(){
+        createPath.setText(System.getProperty("user.dir")+ "/" + createName.getText() + ".db");
+    }
 
 
-   private byte[] toByte(String s){
+    private byte[] toByte(String s){
         byte[] ar;
         ar = s.getBytes();
         return ar;
-   }
+    }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

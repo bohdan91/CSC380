@@ -50,7 +50,7 @@ public class Account implements Serializable {
         this.title = title;
         this.userName = userName;
         this.password = Main.fileManager.encrypt(password);
-        maskedPassword = maskPass(this.password);
+        maskedPassword = maskPass(password);
         this.comment = comment;
         this.type = type;
         this.URL = URL;
@@ -85,8 +85,15 @@ public class Account implements Serializable {
 
     private String maskPass(String password) {
         String output = "";
-        for (int i = 0; i < password.length(); i++) {
-            output += "*";
+
+        if(password.length() > 15) {
+            for (int i = 0; i < 15; i++) {
+                output += "*";
+            }
+        } else {
+            for (int i = 0; i < password.length(); i++) {
+                output += "*";
+            }
         }
         return output;
     }
