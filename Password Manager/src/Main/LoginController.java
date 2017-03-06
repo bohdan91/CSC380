@@ -15,7 +15,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
 
-public class LoginController {
+public class LoginController{
 
     @FXML private PasswordField passField;
     @FXML private Label invalidLabel;
@@ -26,6 +26,9 @@ public class LoginController {
     @FXML private TextField createPath;
     @FXML private Label passShortLabel;
     @FXML private Button createBtn;
+    @FXML private Button pathBtn;
+
+
 
     private Stage fileWindow;
     private Stage newFileWindow;
@@ -91,18 +94,21 @@ public class LoginController {
 
     @FXML
     private void openFilePressed(){
-        FileChooser chooser = new FileChooser();
         fileWindow = new Stage();
+        FileChooser chooser = new FileChooser();
 
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("*.db", "*.db"));
         chooser.setTitle("Choose DB file");
         chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
 
+
         File selectedFile = chooser.showOpenDialog(fileWindow);
+
 
         if(selectedFile != null){
             passField.setDisable(false);
             openBtn.setDisable(false);
+            passField.requestFocus();
             promtLabel.setText("Enter the password: ");
             this.file = selectedFile;
         }
@@ -154,6 +160,11 @@ public class LoginController {
     @FXML
     private void nameEnter(){
         createPath.setText(System.getProperty("user.dir")+ "/" + createName.getText() + ".db");
+    }
+
+    @FXML
+    private void pathBtnPressed(){
+        openFilePressed();
     }
 
 
