@@ -24,7 +24,6 @@ public class FileManager {
     private static String ALGO = "AES";
     private static int keyLength = 16;
     private File dbFile;
-    private String controlKey = "abc123";
     private byte[] keyValue;
     private String uniqueId;
 

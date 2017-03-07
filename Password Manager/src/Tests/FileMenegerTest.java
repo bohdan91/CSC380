@@ -78,14 +78,13 @@ public class FileMenegerTest {
     }
 
     @Test
-    public void testCreateNewDB(){
+    public void testCreateNewDB() throws IOException {
 
         String fileName = "testFile";
         String path     =  System.getProperty("user.dir");
 
         file.createNewDB(fileName, key, path);
 
-        try{
             File f = new File(path + "/" + fileName + ".db");
             FileReader fr = new FileReader(f);
             BufferedReader br = new BufferedReader(fr);
@@ -93,10 +92,6 @@ public class FileMenegerTest {
             br.close();
             fr.close();
             f.delete();
-
-        }catch(Exception e){
-            Assert.fail();
-        }
 
     }
 

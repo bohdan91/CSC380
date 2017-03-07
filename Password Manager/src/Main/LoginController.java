@@ -39,12 +39,13 @@ public class LoginController{
     @FXML
     public void initialize(){
         File selectedFile = Main.fileManager.getDbFile();
-        if(selectedFile!= null){
+        /*if(selectedFile!= null){
             passField.setDisable(false);
             openBtn.setDisable(false);
             promtLabel.setText("Enter the password: ");
             this.file = selectedFile;
         }
+        */
     }
 
     @FXML

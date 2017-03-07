@@ -24,6 +24,10 @@ import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javafx.collections.ObservableList;
 
 /**
  * Created by Bohdan on 2/22/17.
@@ -39,7 +43,9 @@ public class MainWindowController {
     @FXML private TableColumn passColumn;
     @FXML private TableColumn urlColumn;
     @FXML private TableColumn noteColumn;
+    @FXML private ListView<String> typeList;
           private Stage addWindow;
+          private HashMap<String, Integer> listItems;
 
           public static Account accountToAdd;
 
@@ -94,14 +100,31 @@ public class MainWindowController {
         data.add(testAccount);
         data.add(testAccount2);
         */
+        listItems = new HashMap<>();
+        listItems.put("All", 0);
         for(Account ac : Main.accountTable.values()){
 
             data.add(ac);
-
+            listItems.put("All", listItems.get("All") + 1);
+            if(ac.getType() != null && !ac.getType().equals("null") && ac.getType() != ""){
+                if(listItems.containsKey(ac.getType())){
+                    listItems.put(ac.getType(), listItems.get(listItems.get(ac.getType())) + 1);
+                } else {
+                    listItems.put(ac.getType(), 1);
+                }
+            }
         }
+        ObservableList<String> list = FXCollections.observableArrayList ();
+        for(String key : listItems.keySet()){
+            list.add(key + " (" + listItems.get(key) + ")");
+        }
+        typeList.setItems(list);
+
+
 
 
         table.setItems(data);
+        typeList.setItems(list);
 
     }
 
@@ -180,8 +203,6 @@ public class MainWindowController {
         }
 
     }
-
-
 
 
 }
