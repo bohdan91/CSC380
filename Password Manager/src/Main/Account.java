@@ -52,6 +52,9 @@ public class Account implements Serializable {
         this.password = Main.fileManager.encrypt(password);
         maskedPassword = maskPass(password);
         this.comment = comment;
+        if(type == null){
+            type = "Other";
+        }
         this.type = type;
         this.URL = URL;
         this.lastModified = System.currentTimeMillis();
@@ -78,6 +81,9 @@ public class Account implements Serializable {
         this.password = password;
         maskedPassword = maskPass(this.password);
         this.comment = comment;
+        if(type == null || type.equals("")){
+            type = "Other";
+        }
         this.type = type;
         this.URL = URL;
         this.lastModified = lastModified;

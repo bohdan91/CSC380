@@ -27,8 +27,30 @@ public class AddAccountController {
     @FXML private ChoiceBox typeBox;
     @FXML private TextArea note;
 
+    public static Account editAccount;
     //
 
+    @FXML
+    public void initialize(){
+        if(editAccount != null){
+            try {
+                title.setText(editAccount.getTitle());
+                userName.setText(editAccount.getUserName());
+                passField.setText(editAccount.getPassword());
+                if(editAccount.getURL() != null) {
+                    url.setText(editAccount.getURL());
+                }
+                if(editAccount.getType() != null && typeBox.getItems().contains(editAccount.getType())){
+                    typeBox.getSelectionModel().select(editAccount.getType());
+                }
+                if(editAccount.getComment() != null){
+                    note.setText(editAccount.getComment());
+                }
+            }catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @FXML
     private void createBtnPressed() throws InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, NoSuchPaddingException {
