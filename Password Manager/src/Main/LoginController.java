@@ -1,8 +1,5 @@
 package Main;
 
-import java.io.File;
-import java.io.IOException;
-
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,7 +10,13 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+
+import java.io.File;
+import java.io.IOException;
 
 public class LoginController{
 
@@ -38,7 +41,9 @@ public class LoginController{
 
     @FXML
     public void initialize(){
-        File selectedFile = Main.fileManager.getDbFile();
+        if(Main.fileManager != null) {
+            File selectedFile = Main.fileManager.getDbFile();
+        }
         /*if(selectedFile!= null){
             passField.setDisable(false);
             openBtn.setDisable(false);
@@ -61,7 +66,7 @@ public class LoginController{
             //Close Login Window
             Stage stage = (Stage) openBtn.getScene().getWindow();
             stage.close();
-            Main.fileManager.populateTable();
+            //Main.fileManager.populateTable();
 
             //Open Main Window
             this.MainWindow = new Stage();

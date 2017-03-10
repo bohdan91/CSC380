@@ -1,4 +1,5 @@
 package Main;
+
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
@@ -8,11 +9,11 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.math.BigInteger;
 
 
 /**
@@ -24,38 +25,40 @@ public class FileManager {
     private static String ALGO = "AES";
     private static int keyLength = 16;
     private File dbFile;
-    private byte[] keyValue;
+    private Key key;
     private String uniqueId;
 
 
-    public FileManager(){
-
+    public FileManager(File dbFile, Key key){
+        this.dbFile = dbFile;
+        this.key = key;
     }
 
-    public boolean tryOpen(File file, byte[] pas){
+    /**
+     * Tries to decrypt given file with given password
+     * if successful - initializes Main.fileManager object using given parameters
+     *  and loads accounts into Main.accountTable after
+     * @param file db encrypted file
+     * @param pas byte array formatted password
+     * @return
+     */
+    public static boolean tryOpen(File file, byte[] pas){
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
-            keyValue = new byte[keyLength];
-            int c = 0;
-            for(int i = 0; i < keyLength; i ++)
-            {
-                if(pas.length > c){
-                    keyValue[i] = pas[c];
-                    c++;
-                } else {
-                    c = 0;
-                }
-            }
-            dbFile = file;
-
             String control = br.readLine();
-            decrypt(control);
-
-            load();
-
-
-
             br.close();
+
+            byte[] password = formatPassword(pas);
+            Key key = generateKey(password);
+
+            //if this line doesn't throw an exception - password is correct
+            tryDecrypt(key, control);
+
+            //at this point we know that password is correct
+            Main.fileManager = new FileManager(file, key);
+            Main.fileManager.load();
+
+
             return true;
         } catch(Exception e){
             e.printStackTrace();
@@ -63,24 +66,17 @@ public class FileManager {
         }
     }
 
-    public boolean createNewDB(String name, byte[] pas, String path){
-        keyValue = new byte[keyLength];
+    public static boolean createNewDB(String name, byte[] pas, String path){
+        byte[] password =formatPassword(pas);
+        Key key = generateKey(password);
         SecureRandom random = new SecureRandom();
-        uniqueId = new BigInteger(160, random).toString(32);
-        int c = 0;
-        for(int i = 0; i < keyLength; i ++)
-        {
-            if(pas.length > c){
-                keyValue[i] = pas[c];
-                c++;
-            } else {
-                c = 0;
-            }
-        }
+        String uniqueId = new BigInteger(160, random).toString(32);
+
         try{
-            dbFile = new File(path + "/" + name + ".db");
-            BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile));
-            bw.write(encrypt(uniqueId));
+            File file = new File(path + "/" + name + ".db");
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+            String encryptedUID = tryEncrypt(key, uniqueId);
+            bw.write(encryptedUID);
             bw.close();
         }catch (Exception e ) {
             System.err.println(e);
@@ -89,17 +85,39 @@ public class FileManager {
         return true;
     }
 
-    public String encrypt(String Data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Key key = generateKey(keyValue);
-        Cipher c = Cipher.getInstance(ALGO);
-        c.init(Cipher.ENCRYPT_MODE, key);
-        byte[] encVal = c.doFinal(Data.getBytes());
-        String encryptedValue = new BASE64Encoder().encode(encVal);
-        return encryptedValue;
+    /**
+     * For AES 128 bit encryption 16 character password is needed
+     * If password is less then 16 characters - this method repeats it
+     * If password is more then 16 characters - password is cut at 16
+     * @param pas password to format
+     * @return formatted password
+     */
+    private static byte[] formatPassword(byte[] pas){
+        byte[] formatedPassword = new byte[keyLength];
+        int c = 0;
+        for(int i = 0; i < keyLength; i ++)
+        {
+            if(pas.length > c){
+                formatedPassword[i] = pas[c];
+                c++;
+            } else {
+                c = 0;
+            }
+        }
+        return formatedPassword;
+    }
+
+    public String encrypt(String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        return tryEncrypt(this.key, data);
     }
 
     public String decrypt(String encryptedData) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
-        Key key = generateKey(keyValue);
+
+        return tryDecrypt(key, encryptedData);
+    }
+
+    private static String tryDecrypt (Key key, String encryptedData) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+
         Cipher c = Cipher.getInstance(ALGO);
         c.init(Cipher.DECRYPT_MODE, key);
         byte[] decordedValue = new BASE64Decoder().decodeBuffer(encryptedData);
@@ -107,20 +125,28 @@ public class FileManager {
         String decryptedValue = new String(decValue);
         return decryptedValue;
     }
+    private static String tryEncrypt(Key key, String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException{
+        Cipher c = Cipher.getInstance(ALGO);
+        c.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encVal = c.doFinal(data.getBytes());
+        String encryptedValue = new BASE64Encoder().encode(encVal);
+        return encryptedValue;
+    }
+
 
     public void populateTable(){
 
     }
 
     //We use "generateKey()" method to generate a secret key for AES algorithm with a given key.
-    private Key generateKey(byte[] keyValue) {
+    public static Key generateKey(byte[] keyValue) {
         Key key = new SecretKeySpec(keyValue, ALGO);
         return key;
     }
 
-    public void setKey(byte[] key){
-        keyValue = key;
-    }
+//    public void setKey(byte[] key){
+//        keyValue = key;
+//    }
 
     public int getKeyLength(){
         return keyLength;
