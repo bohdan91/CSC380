@@ -1,18 +1,11 @@
 package Main;
 
 
-import javafx.beans.property.SimpleStringProperty;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.io.Serializable;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -76,16 +69,7 @@ public class Account implements Serializable {
      * @throws NoSuchPaddingException
      */
     public Account(String title, String userName, String password, String comment, String type, String URL, long lastModified) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
-        this.title = title;
-        this.userName = userName;
-        this.password = password;
-        maskedPassword = maskPass(this.password);
-        this.comment = comment;
-        if(type == null || type.equals("")){
-            type = "Other";
-        }
-        this.type = type;
-        this.URL = URL;
+        this(title, userName, password,comment, type, URL);
         this.lastModified = lastModified;
     }
 
