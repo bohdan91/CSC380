@@ -39,7 +39,7 @@
             <Insets />
          </opaqueInsets>
       </Label>
-      <TextField fx:id="userNameField" alignment="CENTER" layoutX="110.0" layoutY="84.0" prefHeight="27.0" prefWidth="200.0" promptText="username" />
+      <TextField fx:id="userNameField" alignment="CENTER" layoutX="110.0" layoutY="84.0" onKeyReleased="#setSignInBtn" prefHeight="27.0" prefWidth="200.0" promptText="username" />
       <Label contentDisplay="CENTER" layoutX="22.0" layoutY="89.0" text="User Name: ">
          <font>
             <Font name="System Bold" size="14.0" />
@@ -50,7 +50,7 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <PasswordField fx:id="passField" alignment="CENTER" layoutX="110.0" layoutY="137.0" onKeyReleased="#passwordKeyPressed" prefHeight="27.0" prefWidth="200.0" promptText="password" />
+      <PasswordField fx:id="passField" alignment="CENTER" layoutX="110.0" layoutY="137.0" onKeyReleased="#setSignInBtn" prefHeight="27.0" prefWidth="200.0" promptText="password" />
       <Label layoutX="45.0" layoutY="188.0" text="Don't have an Account ?" />
       <ImageView fitHeight="35.0" fitWidth="43.0" layoutX="110.0" layoutY="38.0" pickOnBounds="true" preserveRatio="true" smooth="false">
          <image>

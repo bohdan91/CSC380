@@ -33,8 +33,6 @@ public class LoginController {
     @FXML private Label passShortLabel;
     @FXML private Label passDontMatchLabel;
     @FXML private Label userNameTooShort;
-
-
     //New account window
 
 
@@ -61,8 +59,7 @@ public class LoginController {
     @FXML
     private void LogInPressed(){
         File possibleFile = new File(System.getProperty("user.dir") + File.separator + userNameField.getText() + ".db");
-        System.out.println(possibleFile);
-
+        
         if(possibleFile.exists() && Main.fileManager.tryOpen(possibleFile, toByte(passField.getText()))){
             //Close Login Window
             Stage stage = (Stage) signInBtn.getScene().getWindow();
@@ -99,30 +96,6 @@ public class LoginController {
     }
 
 
-//    @FXML
-//    private void openFilePressed(){
-//        fileWindow = new Stage();
-//        FileChooser chooser = new FileChooser();
-//
-//        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("*.db", "*.db"));
-//        chooser.setTitle("Choose DB file");
-//        chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
-//
-//
-//        File selectedFile = chooser.showOpenDialog(fileWindow);
-//
-//
-//        if(selectedFile != null){
-//            this.file = selectedFile;
-//            setTitleToFileName();
-//            passField.setDisable(false);
-//            signInBtn.setDisable(false);
-//            passField.requestFocus();
-//        }
-//    }
-
-
-
     private void setTitleToFileName() {
         if (file != null) {
             Stage s = (Stage) signInBtn.getScene().getWindow();
@@ -152,7 +125,7 @@ public class LoginController {
 
     @FXML
     private void createBtnPressed(){
-        //System.out.println("\""+createName.getText()+"\"");
+        //Resetting all warnings
         passShortLabel.setVisible(false);
         passShortLabel.setBorder(null);
         passDontMatchLabel.setVisible(false);
@@ -195,8 +168,8 @@ public class LoginController {
 
 
     @FXML
-    private void passwordKeyPressed(){
-        if(passField.getText().length() > 5){
+    private void setSignInBtn(){
+        if(passField.getText().length() > 5 && userNameField.getText().length() > 4){
             signInBtn.setDisable(false);
         } else {
             signInBtn.setDisable(true);
