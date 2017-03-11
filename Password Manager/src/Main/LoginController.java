@@ -10,7 +10,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -18,18 +17,27 @@ import javafx.stage.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
-public class LoginController{
+public class LoginController {
 
     @FXML private PasswordField passField;
-    @FXML private Label invalidLabel;
-    @FXML private Label promtLabel;
-    @FXML private Button openBtn;
+    @FXML private Label invalidLabel1;
+    @FXML private Label invalidLabel2;
+    @FXML private Button signInBtn;
+    @FXML private TextField userNameField;
+
+    //New account window
     @FXML private TextField createName;
     @FXML private PasswordField createPass;
-    @FXML private TextField createPath;
-    @FXML private Label passShortLabel;
+    @FXML private PasswordField repeatPass;
     @FXML private Button createBtn;
-    @FXML private Button pathBtn;
+    @FXML private Label passShortLabel;
+    @FXML private Label passDontMatchLabel;
+    @FXML private Label userNameTooShort;
+
+
+    //New account window
+
+
 
 
 
@@ -43,28 +51,21 @@ public class LoginController{
     public void initialize(){
         if(Main.fileManager != null) {
             File selectedFile = Main.fileManager.getDbFile();
-        }
-        /*if(selectedFile!= null){
-            passField.setDisable(false);
-            openBtn.setDisable(false);
-            promtLabel.setText("Enter the password: ");
+            userNameField.requestFocus();
             this.file = selectedFile;
         }
-        */
+
     }
 
+
     @FXML
-    private void openPressed(){
+    private void LogInPressed(){
+        File possibleFile = new File(System.getProperty("user.dir") + File.separator + userNameField.getText() + ".db");
+        System.out.println(possibleFile);
 
-        if(Main.fileManager.tryOpen(file, toByte(passField.getText()))){
-            passField.setBorder(new Border(new BorderStroke(Color.LIGHTGREEN, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-            passField.requestFocus();
-            invalidLabel.setText("Logged In!");
-            invalidLabel.setTextFill(Color.LIGHTGREEN);
-            invalidLabel.setVisible(true);
-
+        if(possibleFile.exists() && Main.fileManager.tryOpen(possibleFile, toByte(passField.getText()))){
             //Close Login Window
-            Stage stage = (Stage) openBtn.getScene().getWindow();
+            Stage stage = (Stage) signInBtn.getScene().getWindow();
             stage.close();
             //Main.fileManager.populateTable();
 
@@ -86,11 +87,11 @@ public class LoginController{
                 e.printStackTrace();
             }
 
-        }else{
+        }else{ // file doesn't exist or password is incorrect
+            userNameField.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
             passField.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-            invalidLabel.setText("Invalid Password, try again...");
-            invalidLabel.setTextFill(Color.RED);
-            invalidLabel.setVisible(true);
+            invalidLabel1.setVisible(true);
+            invalidLabel2.setVisible(true);
             passField.requestFocus();
             passField.selectAll();
         }
@@ -98,36 +99,46 @@ public class LoginController{
     }
 
 
-    @FXML
-    private void openFilePressed(){
-        fileWindow = new Stage();
-        FileChooser chooser = new FileChooser();
+//    @FXML
+//    private void openFilePressed(){
+//        fileWindow = new Stage();
+//        FileChooser chooser = new FileChooser();
+//
+//        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("*.db", "*.db"));
+//        chooser.setTitle("Choose DB file");
+//        chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+//
+//
+//        File selectedFile = chooser.showOpenDialog(fileWindow);
+//
+//
+//        if(selectedFile != null){
+//            this.file = selectedFile;
+//            setTitleToFileName();
+//            passField.setDisable(false);
+//            signInBtn.setDisable(false);
+//            passField.requestFocus();
+//        }
+//    }
 
-        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("*.db", "*.db"));
-        chooser.setTitle("Choose DB file");
-        chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
 
 
-        File selectedFile = chooser.showOpenDialog(fileWindow);
-
-
-        if(selectedFile != null){
-            passField.setDisable(false);
-            openBtn.setDisable(false);
-            passField.requestFocus();
-            promtLabel.setText("Enter the password: ");
-            this.file = selectedFile;
+    private void setTitleToFileName() {
+        if (file != null) {
+            Stage s = (Stage) signInBtn.getScene().getWindow();
+            String fileName = file.toString().substring(file.toString().lastIndexOf("/") + 1);
+            s.setTitle(fileName);
         }
     }
 
     @FXML
-    private void newFilePressed(){
+    private void registerPressed(){
         this.newFileWindow = new Stage();
         try {
             AnchorPane pane = FXMLLoader.load(getClass().getResource("CreateDB.fxml"));
             createPanel = new Scene(pane);
 
-            newFileWindow.setTitle("Create New DB");
+            newFileWindow.setTitle("Register an account");
             newFileWindow.initModality(Modality.APPLICATION_MODAL);
             newFileWindow.setScene(createPanel);
             newFileWindow.showAndWait();
@@ -144,18 +155,36 @@ public class LoginController{
         //System.out.println("\""+createName.getText()+"\"");
         passShortLabel.setVisible(false);
         passShortLabel.setBorder(null);
+        passDontMatchLabel.setVisible(false);
+        passDontMatchLabel.setBorder(null);
+        userNameTooShort.setVisible(false);
+        userNameTooShort.setBorder(null);
+
         createName.setBorder(null);
         createPass.setBorder(null);
+        repeatPass.setBorder(null);
+        createPass.setBorder(null);
 
-        if(createName.getText().length() < 1){
+
+        if(createName.getText().length() < 5){
+            userNameTooShort.setVisible(true);
+            //userNameTooShort.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
             createName.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         }
         if(createPass.getText().length() < 5){
             createPass.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
             passShortLabel.setVisible(true);
-            passShortLabel.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+            //passShortLabel.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         }
-        if(createName.getText().length() >= 1 && createPass.getText().length() >= 5) {
+        if(!createPass.getText().equals(repeatPass.getText())){
+            passDontMatchLabel.setVisible(true);
+            //passDontMatchLabel.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+            createPass.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+            repeatPass.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+
+
+        }
+        if(createName.getText().length() >= 5 && createPass.getText().length() >= 5 && createPass.getText().equals(repeatPass.getText())) {
             Main.fileManager.createNewDB(createName.getText(), toByte(createPass.getText()), System.getProperty("user.dir"));
             Stage stage = (Stage) createBtn.getScene().getWindow();
             stage.close();
@@ -163,14 +192,15 @@ public class LoginController{
 
     }
 
-    @FXML
-    private void nameEnter(){
-        createPath.setText(System.getProperty("user.dir")+ "/" + createName.getText() + ".db");
-    }
+
 
     @FXML
-    private void pathBtnPressed(){
-        openFilePressed();
+    private void passwordKeyPressed(){
+        if(passField.getText().length() > 5){
+            signInBtn.setDisable(false);
+        } else {
+            signInBtn.setDisable(true);
+        }
     }
 
 

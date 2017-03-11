@@ -1,19 +1,15 @@
 package Main;
 
-import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -25,10 +21,7 @@ import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.HashMap;
-
-import javafx.collections.ObservableList;
 
 /**
  * Created by Bohdan on 2/22/17.
@@ -235,6 +228,17 @@ public class MainWindowController {
             AnchorPane pane = FXMLLoader.load(getClass().getResource("Login.fxml"));
 
             Scene loginScene = new Scene(pane);
+            //When login screen is loaded back up - sets title to last used .db file
+            loginWindow.addEventHandler(WindowEvent.WINDOW_SHOWING, new  EventHandler<WindowEvent>()
+            {
+                @Override
+                public void handle(WindowEvent window)
+                {
+                    String file = Main.fileManager.getDbFile().toString();
+                    String fileName = file.substring(file.lastIndexOf("/") + 1);
+                    loginWindow.setTitle(fileName);
+                }
+            });
 
             loginWindow.setTitle("Password Manager");
             loginWindow.setResizable(false);
