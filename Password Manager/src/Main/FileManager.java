@@ -28,7 +28,12 @@ public class FileManager {
     private Key key;
     private String uniqueId;
 
-
+    /**
+     * Default constructor for file manager, key has to be checked
+     * first using static tryOpen method
+     * @param dbFile file with encrypted data
+     * @param key correct encryption key for the file
+     */
     public FileManager(File dbFile, Key key){
         this.dbFile = dbFile;
         this.key = key;
@@ -66,6 +71,13 @@ public class FileManager {
         }
     }
 
+    /**
+     * Creates new DB file using path, file name and password passed in parameters
+     * @param name name of db
+     * @param pas unformatted password in byte array
+     * @param path path to create file in (Same as application folder by default)
+     * @return true if file was successfully created, false if error occurred
+     */
     public static boolean createNewDB(String name, byte[] pas, String path){
         byte[] password =formatPassword(pas);
         Key key = generateKey(password);
@@ -107,15 +119,36 @@ public class FileManager {
         return formatedPassword;
     }
 
+    /**
+     * Public helper method for encryption, can only be used when
+     * Main.fileManager was initialized, therefore has key initialized
+     * @param data string to encrypt using existing key
+     * @return encrypted String
+     */
     public String encrypt(String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         return tryEncrypt(this.key, data);
     }
 
+    /**
+     * Public helper method for decryption, can only be used when
+     * Main.fileManager was initialized, therefore has key initialized
+     * @param encryptedData string with encrypted data
+     * @return decrypted String
+     */
     public String decrypt(String encryptedData) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
 
         return tryDecrypt(key, encryptedData);
     }
 
+    /**
+     * Unlike "decrypt" method, this method is static and can be used even
+     * if Main.fileManager is not initialized (in tryOpen method to check if password is correct)
+     * @param key formatted and generated Key to decrypt with
+     * @param encryptedData string with encrypted data
+     * @throws BadPaddingException this exception is usually thrown if password is incorrect
+     * @throws InvalidKeyException probably incorrect key as well
+     * @return decrypted string if password was correct
+     */
     private static String tryDecrypt (Key key, String encryptedData) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
 
         Cipher c = Cipher.getInstance(ALGO);
@@ -125,6 +158,18 @@ public class FileManager {
         String decryptedValue = new String(decValue);
         return decryptedValue;
     }
+
+    /**
+     * Static method for encryption with specified Key, can be used
+     * even if Main.fileManager is not initialized
+     * (if long lines are passed in parameter, then output will be divided into
+     * multiple lines, so you should send line by pieces (of 30 prefferd) and then gluing encrypted output)
+     * @param key formatted and generated key to encrypt with
+     * @param data String to encrypt
+     * @return
+     * @throws BadPaddingException this exception is usually thrown if password is incorrect
+     * @throws InvalidKeyException probably incorrect key as well
+     */
     private static String tryEncrypt(Key key, String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException{
         Cipher c = Cipher.getInstance(ALGO);
         c.init(Cipher.ENCRYPT_MODE, key);
@@ -133,21 +178,22 @@ public class FileManager {
         return encryptedValue;
     }
 
-
-    public void populateTable(){
-
-    }
-
-    //We use "generateKey()" method to generate a secret key for AES algorithm with a given key.
+    /**
+     * We use "generateKey()" method to generate a secret key for AES algorithm with a given key.
+     * before generating a Key it has to be formatted using "formatPassword" method, because key has to be
+     * exactly 16 characters long
+     * @param keyValue formatted password
+     * @return Key that is ready to use for encryption or decryption
+     */
     public static Key generateKey(byte[] keyValue) {
         Key key = new SecretKeySpec(keyValue, ALGO);
         return key;
     }
 
-//    public void setKey(byte[] key){
-//        keyValue = key;
-//    }
-
+    /**
+     * Getter fot default key Length
+     * @return default key length
+     */
     public int getKeyLength(){
         return keyLength;
     }
@@ -155,8 +201,8 @@ public class FileManager {
     /**
      * Saving accounts to the file
      * first line unique identifier
-     * every other line -> account formatted "title/userName/note/type/url/password/date"
-     * @return
+     * every other lines -> accounts formatted "title/userName/note/type/url/password/date"
+     * @return true if saving was successful, if not - false
      */
     public boolean save(){
         try {
@@ -169,6 +215,9 @@ public class FileManager {
             for(Account ac : Main.accountTable.values()){
                 String s = "/title=" +ac.getTitle() + "/username=" + ac.getUserName() + "/comment=" + ac.getComment() + "/type=" + ac.getType();
                 s += "/url=" + ac.getURL() + "/password=" + ac.getPassword() + "/time=" + ac.getLastModified() + "/";
+
+                //this part encrypts string by pieces (read in encrypt description why)
+                //probably should be created in a separate method and called in public "encrypt" method
                 if(s.length() > 30){
                     String t ="";
                     int c = s.length() / 30;
@@ -196,6 +245,11 @@ public class FileManager {
         return false;
     }
 
+    /**
+     * Reads accounts from the file and puts them into Main.accountTable
+     * every other lines -> accounts formatted "title/userName/note/type/url/password/date"
+     * @return true if successfully read the file
+     */
     public boolean load(){
         try {
             FileReader fr = new FileReader(dbFile);
