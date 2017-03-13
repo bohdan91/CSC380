@@ -305,6 +305,10 @@ public class FileManager {
         return false;
     }
 
+    /**
+     * Return current DB file that is used
+     * @return .db file
+     */
     public File getDbFile(){
         return dbFile;
     }
