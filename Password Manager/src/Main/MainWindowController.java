@@ -220,6 +220,7 @@ public class MainWindowController {
     private void lockButtonPressed(){
         try {
             Main.fileManager.save();
+            Main.fileManager.resetPassword();
 
             Stage stage = (Stage) table.getScene().getWindow();
             stage.close();

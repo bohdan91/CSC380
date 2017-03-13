@@ -36,10 +36,6 @@ public class LoginController {
     //New account window
 
 
-
-
-
-    private Stage fileWindow;
     private Stage newFileWindow;
     private Scene createPanel;
     private Stage MainWindow;

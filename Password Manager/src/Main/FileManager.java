@@ -306,6 +306,13 @@ public class FileManager {
     }
 
     /**
+     * Clears the Key file, for security purpose
+     */
+    public void resetPassword(){
+        key = null;
+    }
+
+    /**
      * Return current DB file that is used
      * @return .db file
      */
