@@ -47,7 +47,7 @@ public class LoginController {
             File selectedFile = Main.fileManager.getDbFile();
             this.file = selectedFile;
             String file = Main.fileManager.getDbFile().toString();
-            String name = file.substring(file.lastIndexOf("/") + 1, file.indexOf(".db"));
+            String name = file.substring(file.lastIndexOf(System.getProperty("file.separator")) + 1, file.indexOf(".db"));
             userNameField.setText(name);
             userNameField.setFocusTraversable(false);
             passField.requestFocus();
