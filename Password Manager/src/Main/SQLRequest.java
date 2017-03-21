@@ -1,11 +1,21 @@
 package Main;
-
-public static class SQl {
+import java.sql.*;
+public static class SQLRequest {
 	
 	private String uniquID;
 	
 	public Sring run(String uniqueID){
-		this.uniquID  uniqueID;
+		this.uniqueID = uniqueID;
+		return "";
+	}
+	
+	private int check(){
+		if ()
+			return 1;
+		else if ()
+			return 0;
+		else if()
+			return -1;
 	}
 	
 	private void update(){
