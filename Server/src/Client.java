@@ -11,7 +11,7 @@ public class Client {
     public static void main(String[] args) {
         try {
             // Make connection and initialize streams
-            Socket socket = new Socket("127.0.0.1", 9898);
+            Socket socket = new Socket("passman.ddns.net", 9898);
 
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
