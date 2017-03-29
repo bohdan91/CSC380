@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.*;
@@ -190,11 +191,22 @@ public class MainWindowController {
         loadBar.setProgress(0.6);
 
         //copying username to clipboard
-        String copyUsername = selected.getUserName();
-        final Clipboard clipboard = Clipboard.getSystemClipboard();
-        final ClipboardContent content = new ClipboardContent();
-        content.putString(copyUsername);
-        clipboard.setContent(content);
+        if (selected != null)
+        {
+        	String copyUsername = selected.getUserName();
+        	final Clipboard clipboard = Clipboard.getSystemClipboard();
+        	final ClipboardContent content = new ClipboardContent();
+        	content.putString(copyUsername);
+        	clipboard.setContent(content);
+        }
+        else
+        {
+        	Alert alert = new Alert(AlertType.INFORMATION);
+        	alert.setTitle("No User Name Selected");
+        	alert.setHeaderText(null);
+        	alert.setContentText("Sorry, No User Name Has Been Selected, Try Again.");
+        	alert.showAndWait();
+        }
 
     }
 
@@ -203,11 +215,22 @@ public class MainWindowController {
         Account selected = (Account)table.getSelectionModel().getSelectedItem();
 
         //copying password to clipboard
-        String copyPassword = selected.getPassword();
-        final Clipboard clipboard = Clipboard.getSystemClipboard();
-        final ClipboardContent content = new ClipboardContent();
-        content.putString(copyPassword);
-        clipboard.setContent(content);
+        if (selected != null)
+        {
+        	String copyPassword = selected.getPassword();
+        	final Clipboard clipboard = Clipboard.getSystemClipboard();
+        	final ClipboardContent content = new ClipboardContent();
+        	content.putString(copyPassword);
+        	clipboard.setContent(content);
+        }
+        else
+        {
+        	Alert alert = new Alert(AlertType.INFORMATION);
+        	alert.setTitle("No Password Selected");
+        	alert.setHeaderText(null);
+        	alert.setContentText("Sorry, No Password Has Been Selected, Try Again.");
+        	alert.showAndWait();
+        }
 
     }
 
