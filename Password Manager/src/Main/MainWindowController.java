@@ -24,6 +24,12 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+
+
 /**
  * Created by Bohdan on 2/22/17.
  */
@@ -46,8 +52,8 @@ public class MainWindowController {
           private HashMap<String, Integer> listItems;
 
           public static Account accountToAdd;
-
-
+          
+          Timer timer = new Timer();
 
     //Constructor
     @FXML
@@ -160,8 +166,6 @@ public class MainWindowController {
         }
         typeList.setItems(list);
         table.setItems(data);
-
-
     }
 
     @FXML
@@ -186,7 +190,8 @@ public class MainWindowController {
     }
 
     @FXML
-    private void copyUsernamePressed(){
+    private void copyUsernamePressed()
+    {
         Account selected = (Account)table.getSelectionModel().getSelectedItem();
         loadBar.setProgress(0.6);
 
@@ -207,11 +212,11 @@ public class MainWindowController {
         	alert.setContentText("Sorry, No User Name Has Been Selected, Try Again.");
         	alert.showAndWait();
         }
-
     }
 
     @FXML
-    private void copyPassPressed() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+    private void copyPassPressed() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException 
+    {
         Account selected = (Account)table.getSelectionModel().getSelectedItem();
 
         //copying password to clipboard
@@ -222,6 +227,9 @@ public class MainWindowController {
         	final ClipboardContent content = new ClipboardContent();
         	content.putString(copyPassword);
         	clipboard.setContent(content);
+        	
+        	//clear clipboard after 30 seconds
+        	clipboardTimer();
         }
         else
         {
@@ -231,7 +239,37 @@ public class MainWindowController {
         	alert.setContentText("Sorry, No Password Has Been Selected, Try Again.");
         	alert.showAndWait();
         }
+    }
+    
+    private void clipboardTimer()
+    {
+    	Timer timer = new Timer();
+    	TimerTask task = new TimerTask()
+    	{
+    		int secondsPassed = 0;
+    		
+    		public void run()
+    		{
+    			secondsPassed++;
+    			
+    			if (secondsPassed == 30)
+    			{
+    				timer.cancel();
+    				clearClipboard();
+    			}
+    		}
+    	};
+    	
+    	timer.scheduleAtFixedRate(task, 0, 1000);
+    }
 
+    private void clearClipboard()
+    {
+    	timer.purge();
+    	Toolkit toolkit = Toolkit.getDefaultToolkit();
+    	java.awt.datatransfer.Clipboard clipboard = toolkit.getSystemClipboard();
+    	StringSelection strClear = new StringSelection(" ");
+    	clipboard.setContents(strClear, null);
     }
 
     @FXML
@@ -241,6 +279,7 @@ public class MainWindowController {
 
     @FXML
     private void lockButtonPressed(){
+    	clearClipboard();
         try {
             Main.fileManager.save();
             Main.fileManager.resetPassword();
