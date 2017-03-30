@@ -104,7 +104,7 @@ public class FileManager {
      * @param pas password to format
      * @return formatted password
      */
-    private static byte[] formatPassword(byte[] pas){
+    public static byte[] formatPassword(byte[] pas){
         byte[] formatedPassword = new byte[keyLength];
         int c = 0;
         for(int i = 0; i < keyLength; i ++)
@@ -149,7 +149,7 @@ public class FileManager {
      * @throws InvalidKeyException probably incorrect key as well
      * @return decrypted string if password was correct
      */
-    private static String tryDecrypt (Key key, String encryptedData) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+    public static String tryDecrypt (Key key, String encryptedData) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
 
         Cipher c = Cipher.getInstance(ALGO);
         c.init(Cipher.DECRYPT_MODE, key);
@@ -170,7 +170,7 @@ public class FileManager {
      * @throws BadPaddingException this exception is usually thrown if password is incorrect
      * @throws InvalidKeyException probably incorrect key as well
      */
-    private static String tryEncrypt(Key key, String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException{
+    public static String tryEncrypt(Key key, String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException{
         Cipher c = Cipher.getInstance(ALGO);
         c.init(Cipher.ENCRYPT_MODE, key);
         byte[] encVal = c.doFinal(data.getBytes());
