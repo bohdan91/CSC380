@@ -16,7 +16,7 @@ import java.net.Socket;
  * dependent.  If you ran it from a console window with the "java"
  * interpreter, Ctrl+C generally will shut it down.
  */
-public class Server {
+public class Server1 {
 
     /**
      * Application method to run the server runs in an infinite loop
@@ -80,7 +80,12 @@ public class Server {
                     if (input == null || input.equals(".")) {
                         break;
                     }
-                    out.println(input.toUpperCase());
+                    //out.println(input.toUpperCase());
+                    String output = "";
+                    for(int i = input.length(); i > 0; i --){
+                        output += input.charAt(i - 1);
+                    }
+                    out.println(output);
                 }
             } catch (IOException e) {
                 log("Error handling client# " + clientNumber + ": " + e);
