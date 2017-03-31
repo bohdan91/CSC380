@@ -49,19 +49,18 @@ public class FileManager {
      */
     public static boolean tryOpen(File file, byte[] pas){
         try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String control = br.readLine();
-            br.close();
 
             byte[] password = formatPassword(pas);
             Key key = generateKey(password);
 
             //if this line doesn't throw an exception - password is correct
-            tryDecrypt(key, control);
+            //tryDecrypt(key, control);
+            if(checkPassword(file, key)) {
 
-            //at this point we know that password is correct
-            Main.fileManager = new FileManager(file, key);
-            Main.fileManager.load();
+                //at this point we know that password is correct
+                Main.fileManager = new FileManager(file, key);
+                Main.fileManager.load();
+            }
 
 
             return true;
@@ -70,6 +69,27 @@ public class FileManager {
             return false;
         }
     }
+    private static boolean checkPassword(File file, Key key){
+        //if file exist use it
+        if(file.exists()){
+            try{
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                String control = br.readLine();
+                br.close();
+
+
+            } catch(FileNotFoundException e ){
+                e.printStackTrace();
+            } catch(IOException io){
+
+            }
+        } else{ //file doesn't exit - use server
+
+        }
+        return false;
+    }
+
+
 
     /**
      * Creates new DB file using path, file name and password passed in parameters
