@@ -73,22 +73,40 @@ public class Connection {
         String[] request = new String[2];
         request[0] = "getEncryptedId";
         request[1] = username;
-        try {
-            if (!isConnected) {
-                openConnection();
-                //out.println(request);
-                String reply = in.readLine();
-                closeConnection();
-                return reply;
-            } else {
-                //out.println(request);
-                String reply = in.readLine();
-                return reply;
-            }
-        } catch(IOException e){
-            e.printStackTrace();
+        if(send(request)){
+            return recieve()[0];
+        }else {
             return null;
         }
+
+    }
+
+    private boolean send(String[] ar){
+        if(isConnected || openConnection()){
+                try {
+                    out.writeObject(ar);
+                    return true;
+                }catch(IOException e){
+                    e.printStackTrace();
+                    return false;
+                }
+        } else {
+            return false;
+        }
+    }
+
+    private String[] recieve(){
+        if(isConnected){
+            try{
+                String[] recieve = (String[])in.readObject();
+                return recieve;
+            } catch(ClassNotFoundException e){
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     public ObjectInputStream getIn(){

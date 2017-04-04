@@ -76,12 +76,12 @@ public class FileManager {
                 BufferedReader br = new BufferedReader(new FileReader(file));
                 String control = br.readLine();
                 br.close();
+                tryDecrypt(key, control);
+                return true;
 
-
-            } catch(FileNotFoundException e ){
-                e.printStackTrace();
-            } catch(IOException io){
-
+            } catch(Exception e){
+                System.out.println(e);
+                return false;
             }
         } else{ //file doesn't exit - use server
 

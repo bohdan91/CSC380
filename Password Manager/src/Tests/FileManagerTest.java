@@ -1,17 +1,15 @@
 import Main.FileManager;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
+import org.junit.Assert;
+import org.junit.Test;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-
-import org.junit.*;
 import java.io.File;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 
 public class FileManagerTest
 {
@@ -75,6 +73,7 @@ public class FileManagerTest
 		File file = new File(path + File.separator +fileName + ".db");
 		FileManager.createNewDB(fileName, key, path);
 		byte[] key2 = {7,6,5,4,3,2,1,7,6,5,4,3,2,1,7,6};
+		System.out.println(FileManager.tryOpen(file, key2));
 		Assert.assertFalse(FileManager.tryOpen(file, key2));
 	}
 	

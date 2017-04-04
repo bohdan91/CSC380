@@ -53,7 +53,7 @@ public class Server {
 
                     switch (method) {
                         case "getEncrypted":
-                            //getEncrypted();
+                            //getEncrypted(rqst[1]);
                             String[] sendBack = new String[]{"yourencryptedID"};
                             out.writeObject(sendBack);
                             break;
@@ -78,7 +78,7 @@ public class Server {
         }
 
         //get encrypted
-        public  String getEncrypted(){
+        public  String getEncrypted(String username){
             System.out.println("getEncrypted run");
             return null;
         }
