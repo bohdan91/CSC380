@@ -52,7 +52,7 @@ public class Server {
                     System.out.println("Processing request " + method);
 
                     switch (method) {
-                        case "getEncrypted":
+                        case "getEncryptedId":
                             //getEncrypted(rqst[1]);
                             String[] sendBack = new String[]{"yourencryptedID"};
                             out.writeObject(sendBack);

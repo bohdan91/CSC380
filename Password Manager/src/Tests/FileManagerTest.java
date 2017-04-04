@@ -73,7 +73,6 @@ public class FileManagerTest
 		File file = new File(path + File.separator +fileName + ".db");
 		FileManager.createNewDB(fileName, key, path);
 		byte[] key2 = {7,6,5,4,3,2,1,7,6,5,4,3,2,1,7,6};
-		System.out.println(FileManager.tryOpen(file, key2));
 		Assert.assertFalse(FileManager.tryOpen(file, key2));
 	}
 	

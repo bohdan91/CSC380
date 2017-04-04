@@ -28,18 +28,8 @@ public class Connection {
 
     public static void main(String[] args) {
         getInstance().openConnection();
-        try {
-            String[] send = new String[2];
-            send[0] = "getEncrypted";
-            out.writeObject(send);
-            String[] recieved = (String[])in.readObject();
-            System.out.println(recieved[0]);
+            System.out.println(getInstance().getEncryptedId("bodika"));
 
-        }catch(IOException e){
-            e.printStackTrace();
-        } catch(ClassNotFoundException e){
-            e.printStackTrace();
-        }
         getInstance().closeConnection();
     }
 
@@ -74,14 +64,26 @@ public class Connection {
         request[0] = "getEncryptedId";
         request[1] = username;
         if(send(request)){
-            return recieve()[0];
+            return receive()[0];
         }else {
             return null;
         }
-
     }
 
-    private boolean send(String[] ar){
+    public boolean checkDecryptedId(String decrypted){
+        String[] request = new String[1];
+        request[0] = decrypted;
+
+        if(send(request)){
+            String response = receive()[0];
+            if(response.toLowerCase().equals("true"));{
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private  boolean send(String[] ar){
         if(isConnected || openConnection()){
                 try {
                     out.writeObject(ar);
@@ -95,11 +97,11 @@ public class Connection {
         }
     }
 
-    private String[] recieve(){
+    private String[] receive(){
         if(isConnected){
             try{
-                String[] recieve = (String[])in.readObject();
-                return recieve;
+                String[] receieve = (String[])in.readObject();
+                return receieve;
             } catch(ClassNotFoundException e){
                 e.printStackTrace();
             } catch (IOException e){

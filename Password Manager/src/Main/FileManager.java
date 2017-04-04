@@ -60,10 +60,11 @@ public class FileManager {
                 //at this point we know that password is correct
                 Main.fileManager = new FileManager(file, key);
                 Main.fileManager.load();
+                return true;
+            }else {
+                return false;
             }
 
-
-            return true;
         } catch(Exception e){
             e.printStackTrace();
             return false;
