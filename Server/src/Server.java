@@ -1,11 +1,20 @@
 
 import java.io.*;
 import java.net.*;
+import java.sql.*;
 
 public class Server {
 
-
     public static void main(String[] args) {
+        Connection conn = null;
+        try{
+            String url = "jdbc:sqlite3:test.db";
+            conn = DriverManager.getConnection(url);
+
+            System.out.println("Connection has been established to database");
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
         try {
             int clientNumber = 0;
             ServerSocket listener = new ServerSocket(9898);
@@ -17,7 +26,7 @@ public class Server {
                 listener.close();
             }
         }catch (IOException e){
-
+            e.printStackTrace();
         }
     }
 
@@ -53,8 +62,8 @@ public class Server {
 
                     switch (method) {
                         case "getEncrypted":
-                            //getEncrypted();
-                            String[] sendBack = new String[]{"yourencryptedID"};
+                            String id = getEncrypted(rqst[1]);
+                            String[] sendBack = new String[]{id};
                             out.writeObject(sendBack);
                             break;
                         case "check":
@@ -78,8 +87,9 @@ public class Server {
         }
 
         //get encrypted
-        public  String getEncrypted(){
+        public  String getEncrypted(String userID){
             System.out.println("getEncrypted run");
+
             return null;
         }
 
