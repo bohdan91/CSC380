@@ -54,6 +54,7 @@ public class Server {
                 in = new ObjectInputStream(socket.getInputStream());
                 out = new ObjectOutputStream(socket.getOutputStream());
 
+<<<<<<< HEAD
                 String[] recieved = (String[])in.readObject();
                 String rqst = recieved[0];
                 System.out.println("Processing request " + rqst);
@@ -67,6 +68,29 @@ public class Server {
                     case "check":
                         compare();
                         break;
+=======
+                Object recieved = in.readObject();
+                String[] rqst = new String[0];
+
+                if(recieved.getClass() == rqst.getClass()) {
+
+                    rqst = (String[]) recieved;
+                    String method = rqst[0];
+                    System.out.println("Processing request " + method);
+
+                    switch (method) {
+                        case "getEncryptedId":
+                            //getEncrypted(rqst[1]);
+                            String[] sendBack = new String[]{"yourencryptedID"};
+                            out.writeObject(sendBack);
+                            break;
+                        case "check":
+                            compare();
+                            break;
+                    }
+                } else{
+                    log("Wrong Data Type was recieved!: " + recieved.getClass());
+>>>>>>> origin/master
                 }
 
                 in.close();
@@ -82,7 +106,11 @@ public class Server {
         }
 
         //get encrypted
+<<<<<<< HEAD
         public  String getEncrypted(String userID){
+=======
+        public  String getEncrypted(String username){
+>>>>>>> origin/master
             System.out.println("getEncrypted run");
             String sql = "SELECT uniqueID_enc FROM users WHERE user = \"" + userID + "\"";
 
