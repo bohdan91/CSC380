@@ -53,6 +53,7 @@ public class Server {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 String[] recieved = (String[])in.readObject();
                 String rqst = recieved[0];
                 System.out.println("Processing request " + rqst);
@@ -69,6 +70,8 @@ public class Server {
 =======
 =======
 >>>>>>> parent of 68f61bb... Update to server
+=======
+>>>>>>> parent of 68f61bb... Update to server
                 Object recieved = in.readObject();
                 String[] rqst = new String[0];
 
@@ -80,9 +83,15 @@ public class Server {
 
                     switch (method) {
 <<<<<<< HEAD
+<<<<<<< HEAD
                         case "getEncryptedId":
                             //getEncrypted(rqst[1]);
                             String[] sendBack = new String[]{"yourencryptedID"};
+=======
+                        case "getEncrypted":
+                            String id = getEncrypted(rqst[1]);
+                            String[] sendBack = new String[]{id};
+>>>>>>> parent of 68f61bb... Update to server
 =======
                         case "getEncrypted":
                             String id = getEncrypted(rqst[1]);
@@ -97,7 +106,10 @@ public class Server {
                 } else{
                     log("Wrong Data Type was recieved!: " + recieved.getClass());
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> origin/master
+=======
+>>>>>>> parent of 68f61bb... Update to server
 =======
 >>>>>>> parent of 68f61bb... Update to server
                 }
