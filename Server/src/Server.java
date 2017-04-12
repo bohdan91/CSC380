@@ -1,3 +1,4 @@
+
 import java.io.*;
 import java.net.*;
 import java.sql.*;
@@ -7,9 +8,7 @@ public class Server {
     public static void main(String[] args) {
         Connection conn = null;
         try{
-            //String url = "jdbc:sqlite3:" + System.getProperty("user.dir") + File.separator + "test.db";
-            String url = "jdbc:sqlite:C:/Users/darki/Documents/School/2017-Spring/CSC-380/CSC380/Server/test.db";
-    //Class.forName("");
+            String url = "jdbc:sqlite3:test.db";
             conn = DriverManager.getConnection(url);
 
             System.out.println("Connection has been established to database");
@@ -18,10 +17,10 @@ public class Server {
         }
         try {
             int clientNumber = 0;
-            ServerSocket listener = new ServerSocket(9090);
+            ServerSocket listener = new ServerSocket(9898);
             try {
                 while (true) {
-                    new Service(listener.accept(), clientNumber++, conn).start();
+                    new Service(listener.accept(), clientNumber++).start();
                 }
             } finally {
                 listener.close();
@@ -37,11 +36,9 @@ public class Server {
         private int clientNumber;
         private ObjectInputStream in;
         private ObjectOutputStream out;
-        private Connection connect;
 
 
-        public Service(Socket socket, int clientNumber, Connection connect) {
-            this.connect = connect;
+        public Service(Socket socket, int clientNumber) {
             this.socket = socket;
             this.clientNumber = clientNumber;
             log("New connection with client# " + clientNumber + " at " + socket);
@@ -54,6 +51,7 @@ public class Server {
                 in = new ObjectInputStream(socket.getInputStream());
                 out = new ObjectOutputStream(socket.getOutputStream());
 
+<<<<<<< HEAD
 <<<<<<< HEAD
                 String[] recieved = (String[])in.readObject();
                 String rqst = recieved[0];
@@ -69,6 +67,8 @@ public class Server {
                         compare();
                         break;
 =======
+=======
+>>>>>>> parent of 68f61bb... Update to server
                 Object recieved = in.readObject();
                 String[] rqst = new String[0];
 
@@ -79,9 +79,15 @@ public class Server {
                     System.out.println("Processing request " + method);
 
                     switch (method) {
+<<<<<<< HEAD
                         case "getEncryptedId":
                             //getEncrypted(rqst[1]);
                             String[] sendBack = new String[]{"yourencryptedID"};
+=======
+                        case "getEncrypted":
+                            String id = getEncrypted(rqst[1]);
+                            String[] sendBack = new String[]{id};
+>>>>>>> parent of 68f61bb... Update to server
                             out.writeObject(sendBack);
                             break;
                         case "check":
@@ -90,7 +96,10 @@ public class Server {
                     }
                 } else{
                     log("Wrong Data Type was recieved!: " + recieved.getClass());
+<<<<<<< HEAD
 >>>>>>> origin/master
+=======
+>>>>>>> parent of 68f61bb... Update to server
                 }
 
                 in.close();
@@ -112,13 +121,6 @@ public class Server {
         public  String getEncrypted(String username){
 >>>>>>> origin/master
             System.out.println("getEncrypted run");
-            String sql = "SELECT uniqueID_enc FROM users WHERE user = \"" + userID + "\"";
-
-            try(Connection conn = connect;
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)){
-                System.out.println(rs.getString("user"));
-            }catch(SQLException e){e.printStackTrace();}
 
             return null;
         }
