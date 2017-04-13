@@ -28,22 +28,12 @@ public class Connection {
 
     public static void main(String[] args) {
         getInstance().openConnection();
-        try {
-            String[] send = new String[2];
-            send[0] = "getEncrypted";
-            out.writeObject(send);
-            String[] recieved = (String[])in.readObject();
-            System.out.println(recieved[0]);
+        System.out.println(getInstance().getEncryptedId("bodika"));
 
-        }catch(IOException e){
-            e.printStackTrace();
-        } catch(ClassNotFoundException e){
-            e.printStackTrace();
-        }
         getInstance().closeConnection();
     }
 
-    public boolean openConnection(){
+    private boolean openConnection(){
         try{
             socket = new Socket(address, port);
             out = new ObjectOutputStream(socket.getOutputStream());
@@ -58,7 +48,7 @@ public class Connection {
         }
     }
 
-    public void closeConnection(){
+    private void closeConnection(){
         try {
             isConnected = false;
             out.close();
@@ -73,22 +63,112 @@ public class Connection {
         String[] request = new String[2];
         request[0] = "getEncryptedId";
         request[1] = username;
-        try {
-            if (!isConnected) {
-                openConnection();
-                //out.println(request);
-                String reply = in.readLine();
+        if(openConnection()) {
+            if (send(request)) {
+                String r = receive()[0];
                 closeConnection();
-                return reply;
-            } else {
-                //out.println(request);
-                String reply = in.readLine();
-                return reply;
+                return r;
             }
-        } catch(IOException e){
-            e.printStackTrace();
-            return null;
         }
+        closeConnection();
+        return null;
+    }
+
+    public boolean checkDecryptedId(String decrypted){
+        String[] request = new String[2];
+        request[0] = "checkDecryptedId";
+        request[1] = decrypted;
+
+        if(openConnection()) {
+            if (send(request)) {
+                String response = receive()[0];
+                if (response.toLowerCase().equals("true")) ;
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public String[] getAccounts(String decryptedId){
+        String[] accounts = new String[0];
+        String[] request  = new String[2];
+        request[0] = "getAccounts";
+        request[1] = decryptedId;
+
+        if(openConnection()){
+            if(send(request)){
+                accounts = receive();
+            }
+        }
+        closeConnection();
+        return accounts;
+    }
+
+    public boolean isUserAvailable(String username){
+        String[] request = new String[2];
+        request[0] = "isUserAvailable";
+        request[1] = username;
+
+        if(openConnection()){
+            if(send(request)){
+                String response = receive()[0];
+                if(response.toLowerCase().equals("true")){
+                    closeConnection();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean registerUser(String username, String encryptedId, String decryptedId){
+        String[] request = new String [4];
+        request[0] = "registerUser";
+        request[1] = username;
+        request[2] = encryptedId;
+        request[3] = decryptedId;
+
+        if(openConnection()){
+            if(send(request)){
+                String response = receive()[0];
+                if(response.toLowerCase().equals("true"));{
+                    closeConnection();
+                    return true;
+                }
+            }
+        }
+        closeConnection();
+        return false;
+    }
+
+    private  boolean send(String[] ar){
+        if(isConnected || openConnection()){
+            try {
+                out.writeObject(ar);
+                return true;
+            }catch(IOException e){
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    private String[] receive(){
+        if(isConnected){
+            try{
+                String[] receieve = (String[])in.readObject();
+                return receieve;
+            } catch(ClassNotFoundException e){
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     public ObjectInputStream getIn(){
