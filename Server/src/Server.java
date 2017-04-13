@@ -91,12 +91,16 @@ public class Server {
             System.out.println("getEncrypted run");
             String sql = "SELECT uniqueID_enc FROM users WHERE user = \"" + userID + "\"";
 
-            try(Connection conn = this.connect;
+            try{
+                Connection conn = this.connect;
                 Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)){
+                ResultSet rs = stmt.executeQuery(sql);
 
                 System.out.println(rs.getString("uniqueID_enc"));
-                return rs.getString("uniqueID_enc");
+                String id = rs.getString("uniqueID_enc");
+                rs.close();
+                stmt.close();
+                return id;
 
             }catch(SQLException e){
                     System.out.println("Bad sql request as " + e);
