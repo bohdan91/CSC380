@@ -8,7 +8,7 @@ public class Server {
     public static void main(String[] args) {
         Connection conn = null;
         try{
-            String url = "jdbc:sqlite3:" + System.getProperty("user.dir") + File.separator + "test.db";
+            String url = "jdbc:sqlite:" + System.getProperty("user.dir") + File.separator + "test.db";
             conn = DriverManager.getConnection(url);
 
             System.out.println("Connection has been established to database");
@@ -20,7 +20,7 @@ public class Server {
             ServerSocket listener = new ServerSocket(9898);
             try {
                 while (true) {
-                    new Service(listener.accept(), clientNumber++).start();
+                    new Service(listener.accept(), clientNumber++, conn).start();
                 }
             } finally {
                 listener.close();
@@ -36,11 +36,13 @@ public class Server {
         private int clientNumber;
         private ObjectInputStream in;
         private ObjectOutputStream out;
+        private Connection connect;
 
 
-        public Service(Socket socket, int clientNumber) {
+        public Service(Socket socket, int clientNumber, Connection connect) {
             this.socket = socket;
             this.clientNumber = clientNumber;
+            this.connect = connect;
             log("New connection with client# " + clientNumber + " at " + socket);
         }
 
@@ -51,20 +53,18 @@ public class Server {
                 in = new ObjectInputStream(socket.getInputStream());
                 out = new ObjectOutputStream(socket.getOutputStream());
 
-                Object recieved = in.readObject();
-                String[] rqst = new String[0];
+                String[] recieved = (String[])in.readObject();
 
-                if(recieved.getClass() == rqst.getClass()) {
+                if(recieved.getClass() == recieved.getClass()) {
 
-                    rqst = (String[]) recieved;
-                    String method = rqst[0];
+                    String method = recieved[0];
                     System.out.println("Processing request " + method);
 
-                    switch (method) {
-                        case "getEncrypted":
-                            String id = getEncrypted(rqst[1]);
+                    switch (method.toLowerCase()) {
+                        case "getencryptedid":
+                            String id = getEncrypted(recieved[1]);
                             String[] sendBack = new String[]{id};
-                            out.writeObject(sendBack);
+                            //out.writeObject(sendBack);
                             break;
                         case "check":
                             compare();
@@ -89,7 +89,15 @@ public class Server {
         //get encrypted
         public  String getEncrypted(String userID){
             System.out.println("getEncrypted run");
+            String sql = "SELECT uniqueID_enc FROM users WHERE user = \"" + userID + "\"";
 
+            try(Connection conn = this.connect;
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)){
+
+                System.out.println(rs.getString("uniqueID_enc"));
+
+            }catch(SQLException e){e.printStackTrace();}
             return null;
         }
 
