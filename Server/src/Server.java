@@ -64,7 +64,7 @@ public class Server {
                         case "getencryptedid":
                             String id = getEncrypted(recieved[1]);
                             String[] sendBack = new String[]{id};
-                            //out.writeObject(sendBack);
+                            out.writeObject(sendBack);
                             break;
                         case "check":
                             compare();
@@ -96,6 +96,7 @@ public class Server {
                 ResultSet rs = stmt.executeQuery(sql)){
 
                 System.out.println(rs.getString("uniqueID_enc"));
+                return rs.getString("uniqueID_enc");
 
             }catch(SQLException e){
                     System.out.println("Bad sql request as " + e);
