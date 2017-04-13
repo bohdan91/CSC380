@@ -54,6 +54,8 @@ public class Server {
                 out = new ObjectOutputStream(socket.getOutputStream());
 
                 String[] recieved = (String[])in.readObject();
+                //0 = method
+                //1 = username
 
                 if(recieved.getClass() == recieved.getClass()) {
 
@@ -65,6 +67,16 @@ public class Server {
                             String id = getEncrypted(recieved[1]);
                             String[] sendBack = new String[]{id};
                             out.writeObject(sendBack);
+                            String[] response = (String[])in.readObject();
+                            String[] equal = new String[1];
+                            if (checkID(recieved[1], response[0])){
+                                equal[0] = "true";
+                                out.writeObject(equal);
+                            }
+                            else{
+                                equal[0] = "false";
+                                out.writeObject(equal);
+                            }
                             break;
                         case "check":
                             compare();
@@ -106,6 +118,30 @@ public class Server {
                     System.out.println("Bad sql request as " + e);
             }
             return null;
+        }
+
+        public boolean checkID(String userID, String uniqueID){
+            System.out.println("checkID run");
+            String sql = "SELECT uniqueID_dec FROM users WHERE user = \"" + userID + "\"";
+
+            try{
+                Connection conn = this.connect;
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql);
+
+                System.out.println(rs.getString("uniqueID_dec"));
+                String id = rs.getString("uniqueID_dec");
+                rs.close();
+                stmt.close();
+                if (uniqueID.equals(id))
+                    return true;
+                else
+                    return false;
+
+            }catch(SQLException e){
+                System.out.println("Bad sql request as " + e);
+            }
+            return false;
         }
 
         //compare
