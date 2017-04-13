@@ -10,8 +10,8 @@ public class ServerTestClient {
 
     public static void main(String[] args){
         args = new String[2];
-        args[0] = "passman.ddns.net";
-        //args[0] = "127.0.0.1";
+        //args[0] = "passman.ddns.net";
+        args[0] = "127.0.0.1";
         args[1] = "9898";
         String serverName = args[0];
         int port = Integer.parseInt(args[1]);
@@ -30,12 +30,13 @@ public class ServerTestClient {
                 String[] r = (String[]) in.readObject();
                 String recieve = r[0];
                 System.out.println(recieve);
+                String[] decrypted = {"123456"};
+                out.writeObject(decrypted);
+                String[] check = (String[])in.readObject();
+                System.out.println(check[0]);
             } catch (ClassNotFoundException e){
                 e.printStackTrace();
             }
-
-            //InputStream inFromServer = client.getInputStream();
-            //DataInputStream in = new DataInputStream(inFromServer);
 
             client.close();
         }catch(IOException e){e.printStackTrace();}
