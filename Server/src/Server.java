@@ -97,7 +97,9 @@ public class Server {
 
                 System.out.println(rs.getString("uniqueID_enc"));
 
-            }catch(SQLException e){e.printStackTrace();}
+            }catch(SQLException e){
+                    System.out.println("Bad sql request as " + e);
+            }
             return null;
         }
 
