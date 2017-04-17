@@ -30,10 +30,10 @@ public class ServerTestClient {
                 String[] r = (String[]) in.readObject();
                 String recieve = r[0];
                 System.out.println(recieve);
-                String[] decrypted = {"123456"};
+                String decrypted = "12345";
                 out.writeObject(decrypted);
-                String[] check = (String[])in.readObject();
-                System.out.println(check[0]);
+                String check = (String)in.readObject();
+                System.out.println(check);
             } catch (ClassNotFoundException e){
                 e.printStackTrace();
             }

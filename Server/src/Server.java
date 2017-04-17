@@ -67,15 +67,12 @@ public class Server {
                             String id = getEncrypted(recieved[1]);
                             String[] sendBack = new String[]{id};
                             out.writeObject(sendBack);
-                            String[] response = (String[])in.readObject();
-                            String[] equal = new String[1];
-                            if (checkID(recieved[1], response[0])){
-                                equal[0] = "true";
-                                out.writeObject(equal);
+                            String response = (String)in.readObject();
+                            if (checkID(recieved[1], response)){
+                                out.writeObject("true");
                             }
                             else{
-                                equal[0] = "false";
-                                out.writeObject(equal);
+                                out.writeObject("false");
                             }
                             break;
                         case "check":
