@@ -6,9 +6,14 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.text.Text;
+import javafx.scene.text.Font;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.*;
@@ -50,6 +55,9 @@ public class MainWindowController {
     //Edit account window
           private Stage addWindow;
           private HashMap<String, Integer> listItems;
+          
+          Image img;
+          TreeView<String> tree;
 
           public static Account accountToAdd;
           
@@ -336,6 +344,82 @@ public class MainWindowController {
             Main.accountTable.remove(acToRemove.getTitle());
             populateTypeList();
         }
+    }
+    
+    @FXML
+    private void helpAboutPressed()
+    {
+    	addWindow = new Stage();
+    	addWindow.setTitle("About");
+    	
+    	TreeItem<String> root, branchA, branchB, branchC;
+
+        //Root
+        root = new TreeItem<>();
+        root.setExpanded(true);
+
+        //branchA
+        branchA = makeBranch("Getting Started", root);
+        makeBranch("Creating Database", branchA);
+        makeBranch("Creating Accounts", branchA);
+        makeBranch("Other", branchA);
+
+        //branchB
+        branchB = makeBranch("Maintaining Database", root);
+        makeBranch("This", branchB);
+        makeBranch("That", branchB);
+        makeBranch("The Other", branchB);
+
+        //branchC
+        branchC = makeBranch("Safety Assurance", root);
+        makeBranch("Encryption", branchC);
+        makeBranch("Something", branchC);
+        makeBranch("Ect...", branchC);
+
+        //create tree
+        tree = new TreeView<>(root);
+        tree.setShowRoot(false);
+
+        //Layout
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(15));
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        //Text
+        Text t = new Text();
+        t.setText("About Password Manager");
+        t.setFont(Font.font("American Typewriter", 36));
+        t.setFill(Color.BLACK);
+
+        final HBox txtRegion = new HBox();
+        txtRegion.getChildren().add(t);
+        grid.add(txtRegion, 6/3, 2/3);
+
+        //Image
+        final ImageView imv = new ImageView();
+        final Image img2 = new Image("file:src/resorces/lockIcon2.png");
+        imv.setImage(img2);
+
+        final HBox pictureRegion = new HBox();
+        pictureRegion.getChildren().add(imv);
+        grid.add(pictureRegion, 0, 0);
+
+        BorderPane layout = new BorderPane();
+        layout.setCenter(tree);
+        layout.setTop(grid);
+        Scene scene = new Scene(layout, 650, 500);
+        addWindow.setScene(scene);
+        addWindow.show();
+    }
+    
+    //create treeBranches
+    public TreeItem<String> makeBranch(String title, TreeItem<String> parent)
+    {
+        TreeItem<String> item = new TreeItem<>(title);
+        item.setExpanded(true);
+        parent.getChildren().add(item);
+        return item;
     }
 
 
