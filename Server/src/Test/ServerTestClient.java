@@ -20,7 +20,11 @@ public class ServerTestClient {
         insertUser("Darkking271", "abcdef", "123456");
         insertUser("Bodika", "efrgth", "132435");
         insertUser("scusemae", "jnhbgv", "134679");
-        //testCheckID();
+
+        testCheckID("Darkking271", "123456");
+
+        testCheckUser("Darkking271");
+        testCheckUser("kjfgoij");
     }
 
     public static void insertUser(String userID, String encID, String decID){
@@ -33,14 +37,12 @@ public class ServerTestClient {
             out = new ObjectOutputStream(outToServer);
             in = new ObjectInputStream(client.getInputStream());
 
-            String[] commands = {"registeruser"};
+            String[] commands = {"registeruser", userID, encID, decID};
             out.writeObject(commands);
-            String[] info = {userID, encID, decID};
-            out.writeObject(info);
             String[] response = (String[])in.readObject();
 
             if (response[0].equals("true"))
-                System.out.println("User Added");
+                System.out.println("User " + userID + " Added");
             else if (response[0].equals("false"))
                 System.out.println("User already exists");
 
@@ -50,7 +52,12 @@ public class ServerTestClient {
         catch(IOException e){e.printStackTrace();}
     }
 
-    public static void testCheckID(){
+    public static void testCheckID(String user, String dec){
+        getEncrypted(user);
+        checkDecrypted(user, dec);
+    }
+
+    public static void getEncrypted(String user){
         try {
             System.out.println("Connecting to " + serverName + " on port " + port);
             Socket client = new Socket(serverName, port);
@@ -60,23 +67,61 @@ public class ServerTestClient {
             out = new ObjectOutputStream(outToServer);
             in = new ObjectInputStream(client.getInputStream());
 
-            String[] commands = {"checkid", "Darkking271"};
+            String[] commands = {"getencrypted", user};
             out.writeObject(commands);
 
-            String r = (String) in.readObject();
-            System.out.println("uniqueID: " + r);
-            String decrypted = "123456";
-            out.writeObject(decrypted);
-
-            String check[] = (String[])in.readObject();
-            if (check[0].equals("true"))
-                System.out.println("ID passed");
-            else if (check[0].equals("false"))
-                System.out.println("false");
-
+            String[] r = (String[]) in.readObject();
+            System.out.println("uniqueID: " + r[0]);
         }
         catch(ClassNotFoundException e){e.printStackTrace();}
         catch(IOException e){e.printStackTrace();}
-
     }
+
+    public static void checkDecrypted(String user, String dec){
+        try{
+            System.out.println("Connecting to " + serverName + " on port " + port);
+            Socket client = new Socket(serverName, port);
+
+            System.out.println("Just connected to " + client.getRemoteSocketAddress());
+            OutputStream outToServer = client.getOutputStream();
+            out = new ObjectOutputStream(outToServer);
+            in = new ObjectInputStream(client.getInputStream());
+
+            String[] commands = {"checkdecrypted", user, dec};
+            out.writeObject(commands);
+
+            String[] r = (String[])in.readObject();
+            if (r[0].equals("true"))
+                System.out.println("ID passed");
+            else if (r[0].equals("false"))
+                System.out.println("ID failed");
+        }
+        catch(ClassNotFoundException e){e.printStackTrace();}
+        catch(IOException e){e.printStackTrace();}
+    }
+
+    public static void testCheckUser(String user){
+        try{
+            System.out.println("Connecting to " + serverName + " on port " + port);
+            Socket client = new Socket(serverName, port);
+
+            System.out.println("Just connected to " + client.getRemoteSocketAddress());
+            OutputStream outToServer = client.getOutputStream();
+            out = new ObjectOutputStream(outToServer);
+            in = new ObjectInputStream(client.getInputStream());
+
+            String[] commands = {"isUserAvailable", user};
+            out.writeObject(commands);
+
+            String[] r = (String[])in.readObject();
+            if (r[0].equals("false"))
+                System.out.println("UserName " + user + " unavailable");
+            else if (r[0].equals("true")){
+                System.out.println("UserName " + user + " available");
+            }
+        }
+        catch(IOException e){e.printStackTrace();}
+        catch(ClassNotFoundException e){e.printStackTrace();}
+    }
+
 }

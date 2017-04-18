@@ -40,11 +40,15 @@ public class Service extends Thread{
                 switch (method.toLowerCase()) {
                     case "getencrypted":
                         getEncrypted(recieved[1]);
+                        break;
                     case "checkdecrypted":
                         checkDecrypted(recieved[1], recieved[2]);
                         break;
                     case "registeruser":
-                        registerUser(recieved[2], recieved[3]);
+                        registerUser(recieved[1], recieved[2], recieved[3]);
+                        break;
+                    case "isuseravailable":
+                        checkAvailable(recieved[1]);
                         break;
                 }
             } else {
@@ -66,11 +70,9 @@ public class Service extends Thread{
         log("Running getEncrypted");
 
         try{
-            Connection conn = this.connect;
-
             //Sending sql request
             String sql = "SELECT uniqueID_enc FROM users WHERE user = \"" + user + "\"";
-            Statement stmt = conn.createStatement();
+            Statement stmt = connect.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
 
             //Send response to user
@@ -92,11 +94,9 @@ public class Service extends Thread{
         log("Runngin checkDecrypted");
 
         try{
-            Connection conn = this.connect;
-
             //Sending sql request
-            String sql = "SELECT uniqueID_enc FROM users WHERE user = \"" + user + "\"";
-            Statement stmt = conn.createStatement();
+            String sql = "SELECT uniqueID_dec FROM users WHERE user = \"" + user + "\"";
+            Statement stmt = connect.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
 
             //Check id
@@ -107,6 +107,8 @@ public class Service extends Thread{
             else response[0] = "false";
             out.writeObject(response);
 
+            rs.close();
+            stmt.close();
         }catch(SQLException e) {
             log("Bad sql request as : " + e);
             e.printStackTrace();
@@ -116,16 +118,13 @@ public class Service extends Thread{
         }
     }
 
-    private void registerUser() throws ClassNotFoundException, IOException{
+    private void registerUser(String user, String encID, String decID) throws IOException{
         log("addUser running");
 
         try{
-            Connection conn = this.connect;
-
-            //Send
-            String[] info = (String[])in.readObject();
-            String sql = "INSERT INTO users values(\"" + info[0] + "\", \"" + info[1] + "\", \"" + info[2] + "\")";
-            Statement stmt = conn.createStatement();
+            //Send sql request
+            String sql = "INSERT INTO users values(\"" + user + "\", \"" + encID + "\", \"" + decID + "\")";
+            Statement stmt = connect.createStatement();
 
             //Adding user to table
             stmt.execute(sql);
@@ -136,7 +135,30 @@ public class Service extends Thread{
         }catch(SQLException e){
             String[] response = {"false"};
             out.writeObject(response);
-            log("Bad sql request as: " + e);
+
+            log("Bad sql request as : " + e);
+            e.printStackTrace();
+        }
+    }
+
+    private void checkAvailable(String user) throws IOException{
+        try{
+            //Send sql request
+            String sql = "SELECT 1 FROM users WHERE user = \"" + user + "\"";
+            Statement stmt = connect.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            String r = rs.getString("1");
+            String[] response = {"false"};
+            out.writeObject(response);
+
+            rs.close();
+            stmt.close();
+        }catch(SQLException e){
+            String[] response = {"true"};
+            out.writeObject(response);
+
+            log("Bad sqk request as : " + e);
             e.printStackTrace();
         }
     }

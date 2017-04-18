@@ -61,7 +61,7 @@ public class Connection {
 
     public String getEncryptedId(String username){
         String[] request = new String[2];
-        request[0] = "getEncryptedId";
+        request[0] = "getEncrypted";
         request[1] = username;
         if(openConnection()) {
             if (send(request)) {
@@ -75,9 +75,10 @@ public class Connection {
     }
 
     public boolean checkDecryptedId(String decrypted){
-        String[] request = new String[2];
-        request[0] = "checkDecryptedId";
-        request[1] = decrypted;
+        String[] request = new String[3];
+        request[0] = "checkDecrypted";
+        //request[1] = userName;
+        request[2] = decrypted;
 
         if(openConnection()) {
             if (send(request)) {
