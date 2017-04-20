@@ -3,10 +3,20 @@ import java.net.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-/** Received Array rules
+/**
+ * Created by Alex Voytovich
+ * The service class is what allows communication between the client and
+ * the database. It will receive a string of commands and data, and
+ * retrieve, insert, or update what is necessary from the database
+ *
+ * Received Array rules:
  * Received[0] = method call
  * Received[1] = user name
  * Received[2+] = additional info
+ *
+ * tables:
+ * users(user text UNIQUE PRIMARY KEY, uniqueID_enc text, uniqueID_dec text)
+ * accounts(user text primarykey, title text, enc text)
  */
 public class Service extends Thread{
     private Socket socket;
@@ -15,7 +25,13 @@ public class Service extends Thread{
     private ObjectOutputStream out;
     private Connection connect;
 
-
+    /**
+     * Constructor for Service class
+     *
+     * @param socket
+     * @param clientNumber
+     * @param connect
+     */
     public Service(Socket socket, int clientNumber, Connection connect) {
         this.socket = socket;
         this.clientNumber = clientNumber;
@@ -23,7 +39,15 @@ public class Service extends Thread{
         log("New connection with client# " + clientNumber + " at " + socket);
     }
 
-    //run
+    /**
+     * Main running method
+     *
+     * This method runs the Service class.
+     * It first connects to the database and the client.
+     * It listens for a string of commands, and executes a
+     * method according to what the user passed in.
+     * Finally, it closes the connection
+     */
     public void run(){
         try {
 
@@ -33,6 +57,7 @@ public class Service extends Thread{
             String[] recieved = (String[])in.readObject();
             //0 = method
             //1 = username
+            //2+= other data
             if (recieved.getClass() == recieved.getClass()) {
 
                 String method = recieved[0];
@@ -71,6 +96,13 @@ public class Service extends Thread{
         }
     }
 
+    /**
+     * Retrieve encrypted id
+     *
+     * Takes the username, and sends back an encrypted id for user to unlock
+     *
+     * @param user
+     */
     public void getEncrypted(String user){
         log("Running getEncrypted");
 
@@ -92,6 +124,18 @@ public class Service extends Thread{
         }
     }
 
+
+    /**
+     * Check Decrypted ID
+     *
+     * Recieves user and decrypted id from user.
+     * Retrieves the dycrpted id from the database using the username.
+     * Compares the two decrypted id's, and response true or false
+     * according to result.
+     *
+     * @param user
+     * @param dec
+     */
     public void checkDecrypted(String user, String dec){
         log("Runngin checkDecrypted");
 
@@ -117,6 +161,19 @@ public class Service extends Thread{
         }
     }
 
+
+    /**
+     * Register New User
+     *
+     * Registers a new user into the database.
+     * Sends back true if the user was added.
+     * Sends back false if user already exists
+     *
+     * @param user
+     * @param encID
+     * @param decID
+     * @throws IOException
+     */
     private void registerUser(String user, String encID, String decID) throws IOException{
         log("addUser running");
 
@@ -137,6 +194,17 @@ public class Service extends Thread{
         }
     }
 
+
+    /**
+     * Check User Availability
+     *
+     * Receives a username to check.
+     * If the user exists, it returns false,
+     * if the user does no exist, it return true.
+     *
+     * @param user
+     * @throws IOException
+     */
     private void checkAvailable(String user) throws IOException{
         try{
             //Send sql request
@@ -158,6 +226,18 @@ public class Service extends Thread{
         }
     }
 
+
+    /**
+     * Get Accounts
+     *
+     * Receives a decrypted id, which is processed by getUser(decID)
+     * to receive a username. The username is then used to retrieve
+     * all saved accounts associated with that user.
+     * It stores them into an ArrayList, and returns an array of accounts
+     * using the .toArray() method.
+     *
+     * @param decID
+     */
     private void getAccounts(String decID){
         try{
             //Retrieve id
@@ -183,15 +263,30 @@ public class Service extends Thread{
         }
     }
 
-    private void insertAccount(String decID, String title, String enrypted) throws IOException{
+    /**
+     * Insert Account
+     *
+     * Receives a decID, title, and encrypted account string.
+     * It uses the getUser(decID) method to retrieve the username from
+     * the database, and uses the username to store the account into
+     * the accounts table.
+     * It then returns true if the account was added, or false if it was not.
+     *
+     * @param decID
+     * @param title
+     * @param enc
+     * @throws IOException
+     */
+    private void insertAccount(String decID, String title, String enc) throws IOException{
         try {
             //Retrieve id
             String id = getUser(decID);
 
             //Retrieve accounts
-            String sql = "INSERT INTO accounts WHERE user = \"" + id + "\"";
+            String sql = "INSERT INTO accounts values(\"" + id + "\", \"" + title + "\", \"" + enc + "\"";
             Statement stmt = connect.createStatement();
             stmt.execute(sql);
+            stmt.close();
 
             out.writeObject(singleRespond("true"));
         }catch(SQLException e){
@@ -201,6 +296,79 @@ public class Service extends Thread{
         }
     }
 
+
+    /**
+     * Update Account
+     *
+     * It receives the decID, title, and encrypted account String.
+     * It uses the getUser(decID) method to retrieve the username.
+     * It then uses the username to update and existing account in the
+     * account table.
+     *
+     * @param decID
+     * @param title
+     * @param enc
+     * @throws IOException
+     */
+    private void updateAccount(String decID, String title, String enc) throws IOException{
+        try{
+            //Retrieve id
+            String id = getUser(decID);
+
+            //Update info
+            String sql = "UPDATE accounts SET encrypted = \"" + enc + "\" WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
+            Statement stmt = connect.createStatement();
+            stmt.execute(sql);
+            stmt.close();
+
+            out.writeObject(singleRespond("true"));
+        }catch(SQLException e){
+            out.writeObject(singleRespond("false"));
+
+            log("Bad sql request as : " + e);
+        }
+    }
+
+    /**
+     * Change Account Title
+     *
+     * This class takes in a decID, title, and a new title.
+     * It uses the getUser(decID) method to retrieve the username.
+     * It then changes the title of an account.
+     *
+     * @param decID
+     * @param title
+     * @param newTitle
+     * @throws IOException
+     */
+    private void changeTitle(String decID, String title, String newTitle) throws IOException{
+        try{
+            //Retrieve id
+            String id = getUser(decID);
+
+            //Update title
+            String sql = "UPDATE accounts SET title = \"" + newTitle + "\" WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
+            Statement stmt = connect.createStatement();
+            stmt.execute(sql);
+            stmt.close();
+
+            out.writeObject(singleRespond("true"));
+        }catch(SQLException e){
+            out.writeObject(singleRespond("false"));
+
+
+        }
+    }
+
+    /**
+     * Get Username
+     *
+     * It receives a decrypted id, and finds the username
+     * associated with it for use in other methods.
+     *
+     * @param decID
+     * @return id
+     */
     private String getUser(String decID){
         try{
             //Retrieve userID
@@ -218,14 +386,28 @@ public class Service extends Thread{
         }
     }
 
+    /**
+     * Single String Respond
+     *
+     * It takes a message String,
+     * and returns a single element array for responding
+     * to a client's request.
+     *
+     * @param msg
+     * @return message[]
+     */
     private String[] singleRespond(String msg){
         String[] message = {msg};
         return message;
     }
 
     /**
-     * Logs a simple message.  In this case we just write the
-     * message to the server applications standard output.
+     * Log
+     *
+     * Prints a message to the output stream
+     * and logs it into a log file*.
+     *
+     * @param message
      */
     private void log(String message) {
         System.out.println(message);

@@ -33,8 +33,7 @@ public class ServerTestClient {
             Socket client = new Socket(serverName, port);
 
             System.out.println("Just connected to " + client.getRemoteSocketAddress());
-            OutputStream outToServer = client.getOutputStream();
-            out = new ObjectOutputStream(outToServer);
+            out = new ObjectOutputStream(client.getOutputStream());
             in = new ObjectInputStream(client.getInputStream());
 
             String[] commands = {"registeruser", userID, encID, decID};
