@@ -47,6 +47,45 @@ public class Service extends Thread{
      * It listens for a string of commands, and executes a
      * method according to what the user passed in.
      * Finally, it closes the connection
+     *
+     * possible commands
+     * getencrypted :
+     *      [0] = "getencrypted"
+     *      [1] = user
+     * checkdecrypted :
+     *      [0] = "checkdecrypted
+     *      [1] = user
+     *      [2] = uniqueID_dec
+     * registeruser :
+     *      [0] = "registeruser"
+     *      [1] = user
+     *      [2] = uniqueID_enc
+     *      [3] = uniqueID_dec
+     * isuseravailable :
+     *      [0] = "isuseravailable"
+     *      [1] = user
+     * getaccounts :
+     *      [0] = "getaccounts"
+     *      [1] = uniqueID_dec
+     * insertaccount :
+     *      [0] = "insertaccount"
+     *      [1] = uniqueID_dec
+     *      [2] = title
+     *      [3] = enc (Encrypted account string)
+     * updateaccount :
+     *      [0] = "updateaccount"
+     *      [1] = uniqueID_dec
+     *      [2] = title
+     *      [3] = enc (Encrypted account string)
+     * changetitle :
+     *      [0] = "changetitle"
+     *      [1] = uniqueID_dec
+     *      [2] = title
+     *      [3] = new title
+     * istitleavailable
+     *      [0] = "istitleavailable"
+     *      [1] = uniqueID_dec
+     *      [2] = title
      */
     public void run(){
         try {
@@ -81,6 +120,16 @@ public class Service extends Thread{
                         break;
                     case "insertaccount":
                         insertAccount(recieved[1], recieved[2], recieved[3]);
+                        break;
+                    case "updateaccount":
+                        updateAccount(recieved[1], recieved[2], recieved[3]);
+                        break;
+                    case "changetitle":
+                        changeTitle(recieved[1], recieved[2], recieved[3]);
+                        break;
+                    case "istitleavailable":
+                        checkTitle(recieved[1], recieved[2]);
+                        break;
                 }
             } else {
                 log("Wrong Data Type was recieved!: " + recieved.getClass());
@@ -282,13 +331,17 @@ public class Service extends Thread{
             //Retrieve id
             String id = getUser(decID);
 
-            //Retrieve accounts
-            String sql = "INSERT INTO accounts values(\"" + id + "\", \"" + title + "\", \"" + enc + "\"";
-            Statement stmt = connect.createStatement();
-            stmt.execute(sql);
-            stmt.close();
+            if (checkTitle(decID, title)) {
+                //Retrieve accounts
+                String sql = "INSERT INTO accounts values(\"" + id + "\", \"" + title + "\", \"" + enc + "\"";
+                Statement stmt = connect.createStatement();
+                stmt.execute(sql);
+                stmt.close();
 
-            out.writeObject(singleRespond("true"));
+                out.writeObject(singleRespond("true"));
+            }else{
+                out.writeObject(singleRespond("false"));
+            }
         }catch(SQLException e){
             out.writeObject(singleRespond("false"));
 
@@ -346,17 +399,64 @@ public class Service extends Thread{
             //Retrieve id
             String id = getUser(decID);
 
-            //Update title
-            String sql = "UPDATE accounts SET title = \"" + newTitle + "\" WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
-            Statement stmt = connect.createStatement();
-            stmt.execute(sql);
-            stmt.close();
+            if (checkTitle(decID, newTitle)) {
+                //Update title
+                String sql = "UPDATE accounts SET title = \"" + newTitle + "\" WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
+                Statement stmt = connect.createStatement();
+                stmt.execute(sql);
+                stmt.close();
 
-            out.writeObject(singleRespond("true"));
+                out.writeObject(singleRespond("true"));
+            }else{
+                out.writeObject(singleRespond("false"));
+            }
         }catch(SQLException e){
             out.writeObject(singleRespond("false"));
 
+            log("Bad sql request as : " + e);
+        }
+    }
 
+    /**
+     * Check Title
+     *
+     * It receives a decID, and a title to check.
+     * It receives a user id from the getUser(decID) method.
+     * It then proceeds to check the existence of the title.
+     * If the title exists, it returns false;
+     * if the title does not exist, it return true;
+     * This method can be used internally by other methods,
+     * or be used externally by the client.
+     *
+     * @param decID
+     * @param title
+     * @return
+     */
+    private boolean checkTitle(String decID, String title){
+        try{
+            //Retrieve id
+            String id = getUser(decID);
+
+            //Check title
+            String sql = "SELECT 1 FROM accounts WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
+            Statement stmt = connect.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            String r = rs.getString("1");
+            if (r.equals("1")){
+                try{
+                    out.writeObject(singleRespond("false"));
+                }catch(IOException e){
+                    return false;
+                }
+            }
+        }catch(SQLException e){
+            try{
+                out.writeObject(singleRespond("true"));
+            }catch(IOException i){
+                return true;
+            }
+            log("Bad sql request as : " + e);
         }
     }
 
