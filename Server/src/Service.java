@@ -3,10 +3,10 @@ import java.net.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-/* Received Array rules
+/** Received Array rules
  * Received[0] = method call
  * Received[1] = user name
- * Received[2] = additional info
+ * Received[2+] = additional info
  */
 public class Service extends Thread{
     private Socket socket;
@@ -154,7 +154,7 @@ public class Service extends Thread{
             out.writeObject(singleRespond("true"));
 
             log("User does not exist or ");
-            log("Bad sqk request as : " + e);
+            log("Bad sql request as : " + e);
         }
     }
 
