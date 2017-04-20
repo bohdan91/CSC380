@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.sql.*;
+import java.util.ArrayList;
 
 /* Received Array rules
  * Received[0] = method call
@@ -50,6 +51,11 @@ public class Service extends Thread{
                     case "isuseravailable":
                         checkAvailable(recieved[1]);
                         break;
+                    case "getaccounts":
+                        getAccounts(recieved[1]);
+                        break;
+                    case "insertaccount":
+                        insertAccount(recieved[1], recieved[2], recieved[3]);
                 }
             } else {
                 log("Wrong Data Type was recieved!: " + recieved.getClass());
@@ -61,7 +67,6 @@ public class Service extends Thread{
         }catch(IOException e){
             log("ERROR  " + e);
         } catch(ClassNotFoundException e){
-            e.printStackTrace();
             log("WRONG OBJECT WAS RECIEVED\n" + e);
         }
     }
@@ -76,17 +81,14 @@ public class Service extends Thread{
             ResultSet rs = stmt.executeQuery(sql);
 
             //Send response to user
-            String[] response = {rs.getString("uniqueID_enc")};
-            out.writeObject(response);
+            out.writeObject(singleRespond(rs.getString("uniqueID_enc")));
             rs.close();
             stmt.close();
 
         }catch(SQLException e) {
             log("Bad sql request as : " + e);
-            e.printStackTrace();
         }catch(IOException e){
             log("Bad write : " + e);
-            e.printStackTrace();
         }
     }
 
@@ -101,20 +103,17 @@ public class Service extends Thread{
 
             //Check id
             String decID = rs.getString("uniqueID_dec");
-            String[] response = new String[1];
             if (dec.equals(decID))
-                response[0] = "true";
-            else response[0] = "false";
-            out.writeObject(response);
+                out.writeObject(singleRespond("true"));
+            else
+                out.writeObject(singleRespond("false"));
 
             rs.close();
             stmt.close();
         }catch(SQLException e) {
             log("Bad sql request as : " + e);
-            e.printStackTrace();
         }catch(IOException e){
             log("Bad write : " + e);
-            e.printStackTrace();
         }
     }
 
@@ -128,16 +127,13 @@ public class Service extends Thread{
 
             //Adding user to table
             stmt.execute(sql);
-            String[] response = {"true"};
-            out.writeObject(response);
+            out.writeObject(singleRespond("true"));
 
             stmt.close();
         }catch(SQLException e){
-            String[] response = {"false"};
-            out.writeObject(response);
+            out.writeObject(singleRespond("false"));
 
             log("Bad sql request as : " + e);
-            e.printStackTrace();
         }
     }
 
@@ -149,18 +145,82 @@ public class Service extends Thread{
             ResultSet rs = stmt.executeQuery(sql);
 
             String r = rs.getString("1");
-            String[] response = {"false"};
-            out.writeObject(response);
+            if (r.equals("1"))
+                out.writeObject(singleRespond("false"));
 
             rs.close();
             stmt.close();
         }catch(SQLException e){
-            String[] response = {"true"};
-            out.writeObject(response);
+            out.writeObject(singleRespond("true"));
 
+            log("User does not exist or ");
             log("Bad sqk request as : " + e);
-            e.printStackTrace();
         }
+    }
+
+    private void getAccounts(String decID){
+        try{
+            //Retrieve id
+            String id = getUser(decID);
+
+            //Retrieve accounts
+            String sql = "SELECT encrypted FROM accounts WHERE user = \"" + id + "\"";
+            Statement stmt = connect.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            ArrayList<String> act = new ArrayList<>();
+            while(rs.next()){
+                act.add(rs.getString("ecrypted"));
+            }
+            rs.close();
+            stmt.close();
+            out.writeObject(act.toArray());
+        }catch(SQLException e){
+            log("Bad sql request as : " + e);
+        }
+        catch(IOException e){
+            log("Bad write : " + e);
+        }
+    }
+
+    private void insertAccount(String decID, String title, String enrypted) throws IOException{
+        try {
+            //Retrieve id
+            String id = getUser(decID);
+
+            //Retrieve accounts
+            String sql = "INSERT INTO accounts WHERE user = \"" + id + "\"";
+            Statement stmt = connect.createStatement();
+            stmt.execute(sql);
+
+            out.writeObject(singleRespond("true"));
+        }catch(SQLException e){
+            out.writeObject(singleRespond("false"));
+
+            log("Bad sql request as : " + e);
+        }
+    }
+
+    private String getUser(String decID){
+        try{
+            //Retrieve userID
+            String sql = "SELECT user FROM users WHERE uniqueID_dec = \"" + decID + "\"";
+            Statement stmt = connect.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            String id = rs.getString("user");
+            rs.close();
+            stmt.close();
+            return id;
+        }catch(SQLException e){
+            log("Bad sql request as : " + e);
+            return null;
+        }
+    }
+
+    private String[] singleRespond(String msg){
+        String[] message = {msg};
+        return message;
     }
 
     /**
