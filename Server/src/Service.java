@@ -430,7 +430,7 @@ public class Service extends Thread{
      *
      * @param decID
      * @param title
-     * @return
+     * @return boolean
      */
     private boolean checkTitle(String decID, String title){
         try{
@@ -446,6 +446,7 @@ public class Service extends Thread{
             if (r.equals("1")){
                 try{
                     out.writeObject(singleRespond("false"));
+                    return false;
                 }catch(IOException e){
                     return false;
                 }
@@ -453,11 +454,16 @@ public class Service extends Thread{
         }catch(SQLException e){
             try{
                 out.writeObject(singleRespond("true"));
+
+                log("Bad sql request as : " + e);
+                return true;
             }catch(IOException i){
+
+                log("Bad sql request as : " + e);
                 return true;
             }
-            log("Bad sql request as : " + e);
         }
+        return false;
     }
 
     /**
