@@ -24,35 +24,37 @@ public class FileManager {
 
     private static String ALGO = "AES";
     private static int keyLength = 16;
-    private File dbFile;
     private Key key;
     private String uniqueId;
+    private String username;
 
     /**
      * Default constructor for file manager, key has to be checked
      * first using static tryOpen method
-     * @param dbFile file with encrypted data
+     * @param username file with encrypted data
      * @param key correct encryption key for the file
      */
-    public FileManager(File dbFile, Key key){
-        this.dbFile = dbFile;
+    public FileManager(String username, Key key, String dec){
+        this.username = username;
         this.key = key;
+        this. uniqueId = dec;
     }
 
     /**
      * Tries to decrypt given file with given password
      * if successful - initializes Main.fileManager object using given parameters
      *  and loads accounts into Main.accountTable after
-     * @param file db encrypted file
+     * @param username db encrypted file
      * @param pas byte array formatted password
      * @return
      */
-    public static boolean tryOpen(File file, byte[] pas){
+    public static boolean tryOpen(String username, byte[] pas){
         try {
 
             byte[] password = formatPassword(pas);
             Key key = generateKey(password);
 
+            /*
             //if this line doesn't throw an exception - password is correct
             //tryDecrypt(key, control);
             if(checkPassword(file, key)) {
@@ -60,14 +62,33 @@ public class FileManager {
                 //at this point we know that password is correct
                 Main.fileManager = new FileManager(file, key);
                 Main.fileManager.load();
+            }*/
+            Connection conn = Connection.getInstance();
+            String enc = conn.getEncryptedId(username);
+            String dec = tryDecrypt(key, enc);
+
+            if(conn.checkDecryptedId(username, dec)){
+                Main.fileManager = new FileManager(username, key, dec);
+                Main.fileManager.load();
+                return true;
+            }else{
+                return false;
             }
 
-
-            return true;
-        } catch(Exception e){
+        } catch (IOException e) {
             e.printStackTrace();
-            return false;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            System.out.println("Incorrect password!");
+        } catch (NoSuchPaddingException e) {
+            System.out.println("Incorrect password!");
+        } catch (BadPaddingException e) {
+            System.out.println("Incorrect password!");
+        } catch (IllegalBlockSizeException e) {
+            System.out.println("Incorrect password!");
         }
+        return false;
     }
     private static boolean checkPassword(File file, Key key){
         //if file exist use it
@@ -93,25 +114,25 @@ public class FileManager {
 
     /**
      * Creates new DB file using path, file name and password passed in parameters
-     * @param name name of db
+     * @param username name of db
      * @param pas unformatted password in byte array
-     * @param path path to create file in (Same as application folder by default)
      * @return true if file was successfully created, false if error occurred
      */
-    public static boolean createNewDB(String name, byte[] pas, String path){
+    public static boolean registerUser(String username, byte[] pas){
         byte[] password =formatPassword(pas);
         Key key = generateKey(password);
         SecureRandom random = new SecureRandom();
         String uniqueId = new BigInteger(160, random).toString(32);
+        Connection conn = Connection.getInstance();
+
 
         try{
-            File file = new File(path + "/" + name + ".db");
-            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
             String encryptedUID = tryEncrypt(key, uniqueId);
-            bw.write(encryptedUID);
-            bw.close();
+            conn.registerUser(username, encryptedUID, uniqueId);
+
         }catch (Exception e ) {
             System.err.println(e);
+            return false;
         }
 
         return true;
@@ -224,9 +245,9 @@ public class FileManager {
      * every other lines -> accounts formatted "title/userName/note/type/url/password/date"
      * @return true if saving was successful, if not - false
      */
-    public boolean save(){
+   /* public boolean save(){
         try {
-            FileWriter fw = new FileWriter(dbFile);
+            FileWriter fw = new FileWriter("");
             BufferedWriter out = new BufferedWriter(fw);
             //System.out.println("Writess: " + uniqueId);
             out.write(encrypt(uniqueId));
@@ -264,6 +285,56 @@ public class FileManager {
         }
         return false;
     }
+    */
+
+   public boolean insertAccount(Account ac){
+       try {
+           String s = "/title=" + ac.getTitle() + "/username=" + ac.getUserName() + "/comment=" + ac.getComment() + "/type=" + ac.getType();
+           s += "/url=" + ac.getURL() + "/password=" + ac.getPassword() + "/time=" + ac.getLastModified() + "/";
+
+           //this part encrypts string by pieces (read in encrypt description why)
+           //probably should be created in a separate method and called in public "encrypt" method
+           if (s.length() > 30) {
+               String t = "";
+               int c = s.length() / 30;
+               for (int i = 0; i < c; i++) {
+                   t += encrypt(s.substring(i * 30, (i + 1) * 30));
+               }
+               t += encrypt(s.substring(c * 30));
+               s = t;
+
+
+           } else {
+               s = encrypt(s);
+
+           }
+           Connection conn = Connection.getInstance();
+           if(conn.insertAccount(uniqueId, ac.getTitle(), s)){
+               Main.accountTable.put(ac.getTitle(), ac);
+               return true;
+           }
+
+       } catch (IOException e) {
+           e.printStackTrace();
+           return false;
+       } catch (NoSuchAlgorithmException e) {
+           e.printStackTrace();
+           return false;
+       } catch (InvalidKeyException e) {
+           e.printStackTrace();
+           return false;
+       } catch (NoSuchPaddingException e) {
+           e.printStackTrace();
+           return false;
+       } catch (BadPaddingException e) {
+           e.printStackTrace();
+           return false;
+       } catch (IllegalBlockSizeException e) {
+           e.printStackTrace();
+           return false;
+       }
+       return false;
+   }
 
     /**
      * Reads accounts from the file and puts them into Main.accountTable
@@ -272,14 +343,17 @@ public class FileManager {
      */
     public boolean load(){
         try {
-            FileReader fr = new FileReader(dbFile);
+            /*FileReader fr = new FileReader(dbFile);
             BufferedReader in = new BufferedReader(fr);
 
             this.uniqueId = decrypt(in.readLine());
 
             String line = in.readLine();
+            */
+            Connection conn = Connection.getInstance();
+            String[] accounts = conn.getAccounts(uniqueId);
 
-            while(line != null){
+            for(String line : accounts){
                 String s = line;
                 s = decrypt(s);
                 String t ="";
@@ -313,10 +387,9 @@ public class FileManager {
 
                 Main.accountTable.put(title, ac);
 
-                line = in.readLine();
+
             }
-            in.close();
-            fr.close();
+
 
         } catch(Exception e){
             e.printStackTrace();
@@ -330,14 +403,15 @@ public class FileManager {
      */
     public void resetPassword(){
         key = null;
+        uniqueId = null;
     }
 
     /**
      * Return current DB file that is used
      * @return .db file
      */
-    public File getDbFile(){
-        return dbFile;
+    public String getUsername(){
+        return username;
     }
 
 }

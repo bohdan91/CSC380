@@ -8,7 +8,7 @@ import java.net.Socket;
  */
 public class Connection {
     private static Connection instance = null;
-    private static final String address = "passman.ddns.net";
+    private static final String address = "127.0.0.1";
     private static final int port = 9898;
     private Socket socket;
     private static ObjectInputStream in;
@@ -74,10 +74,10 @@ public class Connection {
         return null;
     }
 
-    public boolean checkDecryptedId(String decrypted){
+    public boolean checkDecryptedId(String username, String decrypted){
         String[] request = new String[3];
         request[0] = "checkDecrypted";
-        //request[1] = userName;
+        request[1] = username;
         request[2] = decrypted;
 
         if(openConnection()) {
@@ -105,6 +105,24 @@ public class Connection {
         }
         closeConnection();
         return accounts;
+    }
+
+    public boolean insertAccount(String dec, String title, String enc){
+        String[] request = new String[4];
+        request[0] = "insertAccount";
+        request[1] = dec;
+        request[2] = title;
+        request[3] = enc;
+        String[] response;
+        if(openConnection()){
+            if(send(request)){
+                response = receive();
+                if(response[0].equals("true")){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public boolean isUserAvailable(String username){

@@ -39,15 +39,12 @@ public class LoginController {
     private Stage newFileWindow;
     private Scene createPanel;
     private Stage MainWindow;
-    private File  file;
+
 
     @FXML
     public void initialize(){
         if(Main.fileManager != null) {
-            File selectedFile = Main.fileManager.getDbFile();
-            this.file = selectedFile;
-            String file = Main.fileManager.getDbFile().toString();
-            String name = file.substring(file.lastIndexOf(System.getProperty("file.separator")) + 1, file.indexOf(".db"));
+            String name = Main.fileManager.getUsername();
             userNameField.setText(name);
             userNameField.setFocusTraversable(false);
             passField.requestFocus();
@@ -60,9 +57,8 @@ public class LoginController {
 
     @FXML
     private void LogInPressed(){
-        File possibleFile = new File(System.getProperty("user.dir") + File.separator + userNameField.getText() + ".db");
-        
-        if(possibleFile.exists() && Main.fileManager.tryOpen(possibleFile, toByte(passField.getText()))){
+
+        if( Main.fileManager.tryOpen(userNameField.getText(), toByte(passField.getText()))){
             //Close Login Window
             Stage stage = (Stage) signInBtn.getScene().getWindow();
             stage.close();
@@ -78,10 +74,11 @@ public class LoginController {
                 //Save on-Close
                 MainWindow.setOnCloseRequest(new EventHandler<WindowEvent>() {
                     public void handle(WindowEvent we) {
-                        Main.fileManager.save();
+                        // Main.fileManager.save();
+                        System.exit(0);
                     }
                 });
-                MainWindow.showAndWait();
+                MainWindow.show();
             } catch(IOException e){
                 e.printStackTrace();
             }
@@ -98,13 +95,7 @@ public class LoginController {
     }
 
 
-    private void setTitleToFileName() {
-        if (file != null) {
-            Stage s = (Stage) signInBtn.getScene().getWindow();
-            String fileName = file.toString().substring(file.toString().lastIndexOf("/") + 1);
-            s.setTitle(fileName);
-        }
-    }
+
 
     @FXML
     private void registerPressed(){
@@ -128,6 +119,7 @@ public class LoginController {
     @FXML
     private void createBtnPressed(){
         //Resetting all warnings
+        userNameTooShort.setText("username at least 5 characters long");
         passShortLabel.setVisible(false);
         passShortLabel.setBorder(null);
         passDontMatchLabel.setVisible(false);
@@ -160,9 +152,17 @@ public class LoginController {
 
         }
         if(createName.getText().length() >= 5 && createPass.getText().length() >= 5 && createPass.getText().equals(repeatPass.getText())) {
-            Main.fileManager.createNewDB(createName.getText(), toByte(createPass.getText()), System.getProperty("user.dir"));
-            Stage stage = (Stage) createBtn.getScene().getWindow();
-            stage.close();
+            Connection conn = Connection.getInstance();
+            if(conn.isUserAvailable(createName.getText())) {
+                Main.fileManager.registerUser(createName.getText(), toByte(createPass.getText()));
+                Stage stage = (Stage) createBtn.getScene().getWindow();
+                stage.close();
+            } else {
+                passShortLabel.setText("username is already taken...");
+                createName.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+                userNameTooShort.setVisible(true);
+
+            }
         }
 
     }

@@ -187,7 +187,7 @@ public class MainWindowController {
             addWindow.showAndWait();
 
             if(accountToAdd != null){
-                Main.accountTable.put(accountToAdd.getTitle(), accountToAdd);
+                System.out.println(Main.fileManager.insertAccount(accountToAdd));
                 accountToAdd = null;
                 populateTypeList();
             }
@@ -282,14 +282,14 @@ public class MainWindowController {
 
     @FXML
     private void saveFile(){
-        Main.fileManager.save();
+       // Main.fileManager.save();
     }
 
     @FXML
     private void lockButtonPressed(){
     	clearClipboard();
         try {
-            Main.fileManager.save();
+            //Main.fileManager.save();
             Main.fileManager.resetPassword();
 
             Stage stage = (Stage) table.getScene().getWindow();
@@ -305,9 +305,9 @@ public class MainWindowController {
                 @Override
                 public void handle(WindowEvent window)
                 {
-                    String file = Main.fileManager.getDbFile().toString();
-                    String fileName = file.substring(file.lastIndexOf("/") + 1);
-                    loginWindow.setTitle(fileName);
+                    //String file = Main.fileManager.getDbFile().toString();
+                    //String fileName = file.substring(file.lastIndexOf("/") + 1);
+                    //loginWindow.setTitle(fileName);
                 }
             });
 

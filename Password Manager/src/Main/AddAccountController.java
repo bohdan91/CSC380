@@ -55,13 +55,15 @@ public class AddAccountController {
     @FXML
     private void createBtnPressed() throws InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, NoSuchPaddingException {
         //System.out.println(typeBox.getValue());
-        Account newAccount  = new Account(title.getText(),userName.getText(), passField.getText(),note.getText(),(String)typeBox.getValue(),url.getText());
+        if(title.getText() != null && !Main.accountTable.containsKey(title.getText())) {
+            Account newAccount = new Account(title.getText(), userName.getText(), passField.getText(), note.getText(), (String) typeBox.getValue(), url.getText());
 
-        MainWindowController.accountToAdd = newAccount;
+            MainWindowController.accountToAdd = newAccount;
 
-        //close the window
-        Stage sc = (Stage)title.getScene().getWindow();
-        sc.close();
+            //close the window
+            Stage sc = (Stage) title.getScene().getWindow();
+            sc.close();
+        }
     }
 
 

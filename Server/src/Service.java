@@ -293,17 +293,21 @@ public class Service extends Thread{
             String id = getUser(decID);
 
             //Retrieve accounts
-            String sql = "SELECT encrypted FROM accounts WHERE user = \"" + id + "\"";
+            String sql = "SELECT enc FROM accounts WHERE user = \"" + id + "\"";
             Statement stmt = connect.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
 
             ArrayList<String> act = new ArrayList<>();
             while(rs.next()){
-                act.add(rs.getString("ecrypted"));
+                act.add(rs.getString("enc"));
+            }
+            String[] response = new String[act.size()];
+            for(int i =0; i < act.size(); i++){
+                response[i] = act.get(i);
             }
             rs.close();
             stmt.close();
-            out.writeObject(act.toArray());
+            out.writeObject(response);
         }catch(SQLException e){
             log("Bad sql request as : " + e);
         }
@@ -333,7 +337,7 @@ public class Service extends Thread{
 
             if (checkTitle(decID, title)) {
                 //Retrieve accounts
-                String sql = "INSERT INTO accounts values(\"" + id + "\", \"" + title + "\", \"" + enc + "\"";
+                String sql = "INSERT INTO accounts values(\"" + id + "\", \"" + title + "\", \"" + enc + "\")";
                 Statement stmt = connect.createStatement();
                 stmt.execute(sql);
                 stmt.close();
