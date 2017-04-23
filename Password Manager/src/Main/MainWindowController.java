@@ -2,6 +2,7 @@ package Main;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -207,7 +208,6 @@ public class MainWindowController {
     private void copyUsernamePressed()
     {
         Account selected = (Account)table.getSelectionModel().getSelectedItem();
-        loadBar.setProgress(0.6);
 
         //copying username to clipboard
         if (selected != null)
@@ -229,7 +229,7 @@ public class MainWindowController {
     }
 
     @FXML
-    private void copyPassPressed() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException 
+    private void copyPassPressed() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException, Exception 
     {
         Account selected = (Account)table.getSelectionModel().getSelectedItem();
 
@@ -243,6 +243,7 @@ public class MainWindowController {
         	clipboard.setContent(content);
         	
         	//clear clipboard after 30 seconds
+        	start();
         	clipboardTimer();
         }
         else
@@ -427,8 +428,42 @@ public class MainWindowController {
         parent.getChildren().add(item);
         return item;
     }
-
-
+    
+    @FXML
+    public void start() throws Exception
+    {
+    	double time = 0.01;
+    	
+    	final Task<Void> task = new Task<Void>()
+    	{
+    		int seconds = 3000;
+    		
+			@Override
+			protected Void call() throws Exception 
+			{
+				for (int i = 0; i < seconds; i++)
+				{
+					updateProgress(i + 1, seconds);
+				}
+				return null;
+			}
+    	};
+    	
+    	loadBar.progressProperty().bind(task.progressProperty());
+    	
+    	loadBar.progressProperty().addListener(observable -> 
+    	{
+    		if (loadBar.getProgress() >= 1 - time)
+    		{
+    			loadBar.setStyle("-fx-accent: lightgreen;");
+    		}
+    	});
+    	
+    	Thread thread = new Thread(task);
+    	thread.setDaemon(true);
+    	thread.start();
+    }
+    
 }
 
 
