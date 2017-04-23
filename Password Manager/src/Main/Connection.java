@@ -118,9 +118,51 @@ public class Connection {
             if(send(request)){
                 response = receive();
                 if(response[0].equals("true")){
+                    closeConnection();
                     return true;
                 }
             }
+            closeConnection();
+        }
+        return false;
+    }
+
+    public boolean updateAccount(String decId, String title, String enc){
+        String[] request = new String[4];
+        request[0] = "updateAccount";
+        request[1] = decId;
+        request[2] = title;
+        request[3] = enc;
+        String[] response;
+        if(openConnection()){
+            if(send(request)){
+                response = receive();
+                if(response[0].equals("true")){
+                    closeConnection();
+                    return true;
+                }
+            }
+            closeConnection();
+        }
+        return false;
+    }
+
+    public boolean changeTitle(String decId, String title, String newTitle){
+        String[] request = new String[4];
+        request[0] = "changeTitle";
+        request[1] = decId;
+        request[2] = title;
+        request[3] = newTitle;
+        String[] response;
+        if(openConnection()){
+            if(send(request)){
+                response = receive();
+                if(response[0].equals("true")){
+                    closeConnection();
+                    return true;
+                }
+            }
+            closeConnection();
         }
         return false;
     }

@@ -286,9 +286,8 @@ public class FileManager {
         return false;
     }
     */
-
-   public boolean insertAccount(Account ac){
-       try {
+   private String encryptAccount(Account ac){
+       try{
            String s = "/title=" + ac.getTitle() + "/username=" + ac.getUserName() + "/comment=" + ac.getComment() + "/type=" + ac.getType();
            s += "/url=" + ac.getURL() + "/password=" + ac.getPassword() + "/time=" + ac.getLastModified() + "/";
 
@@ -302,38 +301,59 @@ public class FileManager {
                }
                t += encrypt(s.substring(c * 30));
                s = t;
-
-
+               return s;
            } else {
                s = encrypt(s);
+               return s;
 
            }
+       } catch (IOException e) {
+           e.printStackTrace();
+       } catch (NoSuchAlgorithmException e) {
+           e.printStackTrace();
+       } catch (InvalidKeyException e) {
+           e.printStackTrace();
+       } catch (NoSuchPaddingException e) {
+           e.printStackTrace();
+       } catch (BadPaddingException e) {
+           e.printStackTrace();
+       } catch (IllegalBlockSizeException e) {
+           e.printStackTrace();
+       }
+       return null;
+   }
+
+   public boolean insertAccount(Account ac){
+
+           String s = encryptAccount(ac);
            Connection conn = Connection.getInstance();
            if(conn.insertAccount(uniqueId, ac.getTitle(), s)){
                Main.accountTable.put(ac.getTitle(), ac);
                return true;
+           }else{
+               return false;
            }
+   }
 
-       } catch (IOException e) {
-           e.printStackTrace();
-           return false;
-       } catch (NoSuchAlgorithmException e) {
-           e.printStackTrace();
-           return false;
-       } catch (InvalidKeyException e) {
-           e.printStackTrace();
-           return false;
-       } catch (NoSuchPaddingException e) {
-           e.printStackTrace();
-           return false;
-       } catch (BadPaddingException e) {
-           e.printStackTrace();
-           return false;
-       } catch (IllegalBlockSizeException e) {
-           e.printStackTrace();
+   public boolean changeTitle(String oldTitle, String newTitle){
+       Connection conn = Connection.getInstance();
+       if(conn.changeTitle(uniqueId, oldTitle, newTitle)){
+           Main.accountTable.get(oldTitle).setTitle(newTitle);
+           return true;
+       } else {
            return false;
        }
-       return false;
+   }
+
+   public boolean updateAccount(Account ac){
+       Connection conn = Connection.getInstance();
+       if(conn.updateAccount(uniqueId, ac.getTitle(),encryptAccount(ac) )){
+           Main.accountTable.remove(ac.getTitle());
+           Main.accountTable.put(ac.getTitle(), ac);
+           return true;
+       } else {
+           return false;
+       }
    }
 
     /**

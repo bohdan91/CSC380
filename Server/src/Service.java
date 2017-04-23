@@ -373,7 +373,7 @@ public class Service extends Thread{
             String id = getUser(decID);
 
             //Update info
-            String sql = "UPDATE accounts SET encrypted = \"" + enc + "\" WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
+            String sql = "UPDATE accounts SET enc = \"" + enc + "\" WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
             Statement stmt = connect.createStatement();
             stmt.execute(sql);
             stmt.close();

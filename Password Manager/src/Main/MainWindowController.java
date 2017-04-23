@@ -131,6 +131,7 @@ public class MainWindowController {
     private void editRequested(Account ac){
         this.addWindow = new Stage();
         try {
+            String oldTitle = ac.getTitle();
             AddAccountController.editAccount = ac;
             AnchorPane pane = FXMLLoader.load(getClass().getResource("AddAccountWindow.fxml"));
             Scene mainScene = new Scene(pane);
@@ -139,8 +140,13 @@ public class MainWindowController {
             addWindow.showAndWait();
 
             if(accountToAdd != null){
-                Main.accountTable.remove(ac.getTitle());
-                Main.accountTable.put(accountToAdd.getTitle(), accountToAdd);
+                if(!accountToAdd.getTitle().equals(oldTitle)){
+                    Main.fileManager.changeTitle(oldTitle, accountToAdd.getTitle());
+                    Main.accountTable.remove(oldTitle);
+                }
+                Main.fileManager.updateAccount(accountToAdd);
+                //Main.accountTable.remove(ac.getTitle());
+                //Main.accountTable.put(accountToAdd.getTitle(), accountToAdd);
                 accountToAdd = null;
                 populateTypeList();
             }
