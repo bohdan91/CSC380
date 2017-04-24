@@ -348,8 +348,10 @@ public class MainWindowController {
     private void removeAccountPressed(){
         Account acToRemove = (Account)table.getSelectionModel().getSelectedItem();
         if(acToRemove != null) {
-            Main.accountTable.remove(acToRemove.getTitle());
-            populateTypeList();
+            if(Main.fileManager.deleteAccount(acToRemove)) {
+                Main.accountTable.remove(acToRemove.getTitle());
+                populateTypeList();
+            }
         }
     }
     

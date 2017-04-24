@@ -356,6 +356,15 @@ public class FileManager {
        }
    }
 
+   public boolean deleteAccount(Account ac){
+       Connection conn = Connection.getInstance();
+       if(conn.deleteAccount(uniqueId, ac.getTitle())){
+           return true;
+       } else {
+           return false;
+       }
+   }
+
     /**
      * Reads accounts from the file and puts them into Main.accountTable
      * every other lines -> accounts formatted "title/userName/note/type/url/password/date"

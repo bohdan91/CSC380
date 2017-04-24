@@ -128,6 +128,25 @@ public class Connection {
         return false;
     }
 
+    public boolean deleteAccount(String decID, String title){
+        String[] request = new String[3];
+        request[0] = "removeAccount";
+        request[1] = decID;
+        request[2] = title;
+        String[] response;
+        if(openConnection()){
+            if(send(request)){
+                response = receive();
+                if(response[0].equals("true")){
+                    closeConnection();
+                    return true;
+                }
+            }
+            closeConnection();
+        }
+        return false;
+    }
+
     public boolean updateAccount(String decId, String title, String enc){
         String[] request = new String[4];
         request[0] = "updateAccount";
