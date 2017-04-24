@@ -242,7 +242,7 @@ public class MainWindowController {
         	content.putString(copyPassword);
         	clipboard.setContent(content);
         	
-        	//clear clipboard after 30 seconds
+        	//clear clipboard after 30 seconds & starts progressBar
         	start();
         	clipboardTimer();
         }
@@ -359,74 +359,114 @@ public class MainWindowController {
     	addWindow = new Stage();
     	addWindow.setTitle("About");
     	
-    	TreeItem<String> root, branchA, branchB, branchC;
-
-        //Root
-        root = new TreeItem<>();
-        root.setExpanded(true);
-
-        //branchA
-        branchA = makeBranch("Getting Started", root);
-        makeBranch("Creating Database", branchA);
-        makeBranch("Creating Accounts", branchA);
-        makeBranch("Other", branchA);
-
-        //branchB
-        branchB = makeBranch("Maintaining Database", root);
-        makeBranch("This", branchB);
-        makeBranch("That", branchB);
-        makeBranch("The Other", branchB);
-
-        //branchC
-        branchC = makeBranch("Safety Assurance", root);
-        makeBranch("Encryption", branchC);
-        makeBranch("Something", branchC);
-        makeBranch("Ect...", branchC);
-
-        //create tree
-        tree = new TreeView<>(root);
-        tree.setShowRoot(false);
-
-        //Layout
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(15));
         grid.setHgap(10);
         grid.setVgap(10);
 
-        //Text
-        Text t = new Text();
-        t.setText("About Password Manager");
-        t.setFont(Font.font("American Typewriter", 36));
-        t.setFill(Color.BLACK);
-
         final HBox txtRegion = new HBox();
-        txtRegion.getChildren().add(t);
+        txtRegion.getChildren().add(helpWindowText());
         grid.add(txtRegion, 6/3, 2/3);
 
-        //Image
-        final ImageView imv = new ImageView();
-        final Image img2 = new Image("file:src/resorces/lockIcon2.png");
-        imv.setImage(img2);
-
         final HBox pictureRegion = new HBox();
-        pictureRegion.getChildren().add(imv);
+        pictureRegion.getChildren().add(helpWindowImage());
         grid.add(pictureRegion, 0, 0);
 
         BorderPane layout = new BorderPane();
-        layout.setCenter(tree);
+        layout.setCenter(helpWindowCreateTree());
         layout.setTop(grid);
         Scene scene = new Scene(layout, 650, 500);
         addWindow.setScene(scene);
         addWindow.show();
     }
     
+    public TreeView<String> helpWindowCreateTree()
+    {
+        TreeItem<String> root, branchA, branchB, branchC;
+        TreeItem<String> branchA_1, branchA_2;
+        TreeItem<String> branchB_1, branchB_2;
+        TreeItem<String> branchC_1, branchC_2, branchD;
+
+        //Root
+        root = new TreeItem<>();
+        root.setExpanded(true);
+        
+        //branchA
+        branchA = makeBranch("Getting Started", root);
+        branchA.setExpanded(true);
+        branchA_1 = makeBranch("Creating Database", branchA);
+        makeBranch("- Upon first introduction, you will be prompted to create a unique 'Username'" +
+                "and 'Password'." + "\n\n" +
+                "- This creates a unique login and access to your own unique database, which will hold all" +
+                "\n" + "   'Accounts', or your specific information you wish to secure.", branchA_1);
+        branchA_2 = makeBranch("Creating Accounts", branchA);
+        makeBranch("- Once having access to your database, you can freely add your 'Accounts'" + "\n" +
+                "   ranging from Banking, Social, Email, Gaming, and Other " + "\n\n" +
+                "- Click 'Add Account' to be prompted to enter the specified accounts information" +
+                "\n\n" + "- This includes: " +
+                " Title - of the account (e.g. Gaming_Account_1) \n\t\t\t   Username - for the specified" +
+                "account (Gaming_User123) \n\t\t\t   Password - to be secured for the account (Gaming_password)" +
+                "\n\t\t\t   URL - of the website/etc. to be saved (gaming.com) \n\t\t\t" +
+                "   Type - type of saved password for ease of finding (gaming)" +
+                "\n\t\t\t   Notes - for any extra information you need to save (trial expires xx/xx/xxxx " , branchA_2);
+
+        //branchB
+        branchB = makeBranch("Maintaining Your Database", root);
+        branchB.setExpanded(true);
+        branchB_1 = makeBranch("Keeping Your Database Up to Date", branchB);
+        makeBranch("- No need to worry, we automatically update your database once they're added", branchB_1);
+        branchB_2 = makeBranch("Duplicate Accounts", branchB);
+        makeBranch("- You don't have to deal with all the clutter, as once a account or username" +
+                "\n" + "   is added, you will receive an error not allowing a duplicate", branchB_2);
+
+        //branchC
+        branchC = makeBranch("Features of Password Manager", root);
+        branchC.setExpanded(true);
+        branchC_1 = makeBranch("Safety Assurance", branchC);
+        makeBranch("- Rest assured, we encrypt all sensitive information and passwords", branchC_1);
+        branchC_2 = makeBranch("Copying Usernames & Passwords", branchC);
+        makeBranch("- Clicking 'Copy Username' will copy your username to the clipboard so you can " +
+                "\n   paste it where ever you'd like \n\n - Clicking 'Copy Password' will do the same, except " +
+                "a 30 second timer will start, \n   which at completion, will erase the clipboard \n\n" +
+                "- A progress bar on the bottom right of your screen will allow you to visually see " +
+                "\n   how much time you have remaining to paste your password before it is erased ", branchC_2);
+
+        //branchD
+        branchD = makeBranch("Thank You!", root);
+        branchD.setExpanded(true);
+        makeBranch("- Thank you for using our application, we hope you enjoy it and find it helpful", branchD);
+        
+        //create tree
+        tree = new TreeView<>(root);
+        tree.setShowRoot(false);
+
+        return tree;
+    }
+    
     //create treeBranches
     public TreeItem<String> makeBranch(String title, TreeItem<String> parent)
     {
         TreeItem<String> item = new TreeItem<>(title);
-        item.setExpanded(true);
+        item.setExpanded(false);
         parent.getChildren().add(item);
         return item;
+    }
+    
+    public ImageView helpWindowImage()
+    {
+        final ImageView imv = new ImageView();
+        final Image img2 = new Image("file:src/resorces/lockIcon2.png");
+        imv.setImage(img2);
+        return imv;
+    }
+    
+    public Text helpWindowText()
+    {
+        Text t = new Text();
+        t.setText("About Password Manager");
+        t.setFont(Font.font("American Typewriter", 36));
+        t.setFill(Color.BLACK);
+        return t;
     }
     
     @FXML
