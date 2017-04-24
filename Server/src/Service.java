@@ -72,6 +72,10 @@ public class Service extends Thread{
      *      [1] = uniqueID_dec
      *      [2] = title
      *      [3] = enc (Encrypted account string)
+     * deleteaccount :
+     *      [0] = "deleteaccount"
+     *      [1] = uniqueID_dec
+     *      [2] = title
      * updateaccount :
      *      [0] = "updateaccount"
      *      [1] = uniqueID_dec
@@ -120,6 +124,9 @@ public class Service extends Thread{
                         break;
                     case "insertaccount":
                         insertAccount(recieved[1], recieved[2], recieved[3]);
+                        break;
+                    case "deleteaccount":
+                        deleteAccount(recieved[1], recieved[2]);
                         break;
                     case "updateaccount":
                         updateAccount(recieved[1], recieved[2], recieved[3]);
@@ -346,6 +353,24 @@ public class Service extends Thread{
             }else{
                 out.writeObject(singleRespond("false"));
             }
+        }catch(SQLException e){
+            out.writeObject(singleRespond("false"));
+
+            log("Bad sql request as : " + e);
+        }
+    }
+
+    private void deleteAccount(String decID, String title)throws IOException{
+        try{
+            //Retrieve id
+            String id = getUser(decID);
+
+            String sql = "DELETE FROM accounts WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
+            Statement stmt = connect.createStatement();
+            stmt.execute(sql);
+            stmt.close();
+
+            out.writeObject(singleRespond("true"));
         }catch(SQLException e){
             out.writeObject(singleRespond("false"));
 
