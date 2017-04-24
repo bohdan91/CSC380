@@ -360,6 +360,17 @@ public class Service extends Thread{
         }
     }
 
+    /**
+     * Delete Account
+     *
+     * Recieves the decID, and title that the user desires to delete. It then processes
+     * the sql request to remove the account. The function then writes out true or false
+     * whether the account was deleted or not.
+     * 
+     * @param decID
+     * @param title
+     * @throws IOException
+     */
     private void deleteAccount(String decID, String title)throws IOException{
         try{
             //Retrieve id
