@@ -307,6 +307,12 @@ public class MainWindowController {
 
             Scene loginScene = new Scene(pane);
             //When login screen is loaded back up - sets title to last used .db file
+            loginWindow.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                public void handle(WindowEvent we) {
+                    // Main.fileManager.save();
+                    System.exit(0);
+                }
+            });
             loginWindow.addEventHandler(WindowEvent.WINDOW_SHOWING, new  EventHandler<WindowEvent>()
             {
                 @Override
