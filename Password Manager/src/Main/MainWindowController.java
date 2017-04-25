@@ -37,7 +37,8 @@ import java.awt.datatransfer.StringSelection;
 
 
 /**
- * Created by Bohdan on 2/22/17.
+ * Created by Bohdan Yevdokymov
+ * Controller class for main program window
  */
 public class MainWindowController {
 
@@ -64,23 +65,20 @@ public class MainWindowController {
           
           Timer timer = new Timer();
 
-    //Constructor
+    /**
+     * Constructor for main window, load side panel items,
+     * load table from the server
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws IllegalBlockSizeException
+     * @throws NoSuchPaddingException
+     */
     @FXML
     public void initialize() throws InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, NoSuchPaddingException {
         table.setEditable(false);
 
         final ContextMenu contextMenu = new ContextMenu();
-        /*contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
-            public void handle(WindowEvent e) {
-                //System.out.println("showing");
-            }
-        });
-        contextMenu.setOnShown(new EventHandler<WindowEvent>() {
-            public void handle(WindowEvent e) {
-                //System.out.println("shown");
-            }
-        });
-        */
 
         MenuItem item1 = new MenuItem("Copy Username");
         item1.setOnAction(new EventHandler<ActionEvent>() {
@@ -129,6 +127,12 @@ public class MainWindowController {
         typeList.getSelectionModel().select(0);
 
     }
+
+    /**
+     * Handles edit account request
+     * Initializes addAccount window and presets it to account to edit
+     * @param ac Account to edit
+     */
     private void editRequested(Account ac){
         this.addWindow = new Stage();
         try {
@@ -158,6 +162,9 @@ public class MainWindowController {
         AddAccountController.editAccount = null;
     }
 
+    /**
+     * Updates table of accounts from Main.accountTable
+     */
     private void populateTypeList(){
         listItems = new HashMap<>();
         data  = FXCollections.observableArrayList();
@@ -183,6 +190,9 @@ public class MainWindowController {
         table.setItems(data);
     }
 
+    /**
+     * Initializes window to add a new account
+     */
     @FXML
     private void addAccountPressed() {
         this.addWindow = new Stage();
@@ -204,6 +214,9 @@ public class MainWindowController {
         }
     }
 
+    /**
+     * Copies username of selected account to clipboard
+     */
     @FXML
     private void copyUsernamePressed()
     {
@@ -228,6 +241,18 @@ public class MainWindowController {
         }
     }
 
+    /**
+     * Copies password for selected account,
+     * runs 30sec timer to clear clipboard after
+     *
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidKeyException
+     * @throws Exception
+     */
     @FXML
     private void copyPassPressed() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException, Exception 
     {
@@ -255,7 +280,10 @@ public class MainWindowController {
         	alert.showAndWait();
         }
     }
-    
+
+    /**
+     * Timer to count down 30 second and clear clipboard after
+     */
     private void clipboardTimer()
     {
     	Timer timer = new Timer();
@@ -278,6 +306,9 @@ public class MainWindowController {
     	timer.scheduleAtFixedRate(task, 0, 1000);
     }
 
+    /**
+     * Clears clipboard
+     */
     private void clearClipboard()
     {
     	timer.purge();
@@ -288,10 +319,12 @@ public class MainWindowController {
     }
 
     @FXML
-    private void saveFile(){
-       // Main.fileManager.save();
-    }
+    public void saveFile(){}
 
+    /**
+     * Handles lock button, clears the password, closes main window
+     * and opens login window prefilled with last used login
+     */
     @FXML
     private void lockButtonPressed(){
     	clearClipboard();
@@ -334,6 +367,10 @@ public class MainWindowController {
 
     }
 
+    /**
+     * Handles event when another type is selected from the side menu
+     * selects accounts with type specified and updates the table with them
+     */
     @FXML
     private void typeSwitched(){
         String selected = typeList.getSelectionModel().getSelectedItem();
@@ -350,6 +387,9 @@ public class MainWindowController {
         table.setItems(data);
     }
 
+    /**
+     * Removes the selected account from table and from the server
+     */
     @FXML
     private void removeAccountPressed(){
         Account acToRemove = (Account)table.getSelectionModel().getSelectedItem();
@@ -360,7 +400,10 @@ public class MainWindowController {
             }
         }
     }
-    
+
+    /**
+     * Opens an About window
+     */
     @FXML
     private void helpAboutPressed()
     {

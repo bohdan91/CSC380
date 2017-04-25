@@ -4,7 +4,10 @@ import java.io.*;
 import java.net.Socket;
 
 /**
- * Created by Bohdan on 3/30/17.
+ * Created by Bohdan Yevdokymov
+ *
+ * Class that manages all requests and receives information
+ * from the server, each request is processed separately
  */
 public class Connection {
     private static Connection instance = null;
@@ -16,9 +19,19 @@ public class Connection {
     private static ObjectOutputStream out;
     private static boolean isConnected = false;
 
+    /**
+     * This is "singleton" type of class and instance can only
+     * be obtained from "getInstance" method to avoid multiple
+     * instances.
+     */
     protected Connection(){
     }
 
+    /**
+     * Method that is used to obtain and use an instance of
+     * Connection class
+     * @return instance of Connection Class
+     */
     public static Connection getInstance(){
         if(instance == null){
             return instance = new Connection();
@@ -27,13 +40,11 @@ public class Connection {
         }
     }
 
-    public static void main(String[] args) {
-        //getInstance().openConnection();
-        System.out.println(getInstance().getEncryptedId("Darkking271"));
-
-        //getInstance().closeConnection();
-    }
-
+    /**
+     * Opens a connection with a server using static address and port,
+     * creates in and output Streams.
+     * @return
+     */
     private boolean openConnection(){
         try{
             socket = new Socket(address, port);
@@ -49,6 +60,9 @@ public class Connection {
         }
     }
 
+    /**
+     * Closes a connection with a server
+     */
     private void closeConnection(){
         try {
             isConnected = false;
@@ -60,6 +74,11 @@ public class Connection {
         }
     }
 
+    /**
+     * Requests encrypted unique ID for given username from the server
+     * @param username username to ger encrypted id for
+     * @return Encrypted ID
+     */
     public String getEncryptedId(String username){
         String[] request = new String[2];
         request[0] = "getEncrypted";
@@ -75,6 +94,13 @@ public class Connection {
         return null;
     }
 
+    /**
+     * Sends username and possible decrypted ID to the server
+     * Server compares it to existing one and gives the result
+     * @param username username to check for
+     * @param decrypted possible decrypted ID
+     * @return true if decrypted ID is correct
+     */
     public boolean checkDecryptedId(String username, String decrypted){
         String[] request = new String[3];
         request[0] = "checkDecrypted";
@@ -93,6 +119,11 @@ public class Connection {
         return false;
     }
 
+    /**
+     * Loads array of encrypted Strings - that are accounts from the server
+     * @param decryptedId decrypted id to identify
+     * @return array of Strings (formatted Accounts)
+     */
     public String[] getAccounts(String decryptedId){
         String[] accounts = new String[0];
         String[] request  = new String[2];
@@ -108,6 +139,13 @@ public class Connection {
         return accounts;
     }
 
+    /**
+     * Adds new Account for the user.
+     * @param dec identifier
+     * @param title title of account that is being added
+     * @param enc formatted and encrypted
+     * @return
+     */
     public boolean insertAccount(String dec, String title, String enc){
         String[] request = new String[4];
         request[0] = "insertAccount";
@@ -128,6 +166,12 @@ public class Connection {
         return false;
     }
 
+    /**
+     * Method to remove specified account from the server
+     * @param decID identifier
+     * @param title title of an account to remove
+     * @return true if was removed
+     */
     public boolean deleteAccount(String decID, String title){
         String[] request = new String[3];
         request[0] = "deleteAccount";
@@ -147,6 +191,13 @@ public class Connection {
         return false;
     }
 
+    /**
+     * Updates an account information for specified user with specified title
+     * @param decId identifier
+     * @param title title to update
+     * @param enc String to replace old one
+     * @return
+     */
     public boolean updateAccount(String decId, String title, String enc){
         String[] request = new String[4];
         request[0] = "updateAccount";
@@ -167,6 +218,14 @@ public class Connection {
         return false;
     }
 
+    /**
+     * Changes title to existing account on the server, needed to be done
+     * before updating an account
+     * @param decId identifier
+     * @param title old title to replace
+     * @param newTitle new title to replace with
+     * @return true if sucessful
+     */
     public boolean changeTitle(String decId, String title, String newTitle){
         String[] request = new String[4];
         request[0] = "changeTitle";
@@ -187,6 +246,12 @@ public class Connection {
         return false;
     }
 
+    /**
+     * Method to check on the server if username is not taken already
+     * and can be used
+     * @param username username to check
+     * @return true if available
+     */
     public boolean isUserAvailable(String username){
         String[] request = new String[2];
         request[0] = "isUserAvailable";
@@ -204,6 +269,14 @@ public class Connection {
         return false;
     }
 
+    /**
+     * Register new user to the server, has to be confirmed that username is available before
+     * using method "isUserAvailable"
+     * @param username username to register
+     * @param encryptedId generated unique id
+     * @param decryptedId encrypted unique id
+     * @return true if was successful
+     */
     public boolean registerUser(String username, String encryptedId, String decryptedId){
         String[] request = new String [4];
         request[0] = "registerUser";
@@ -224,6 +297,13 @@ public class Connection {
         return false;
     }
 
+    /**
+     * Sends request to the server in format of String array,
+     * where first string is method name and all of the others -
+     * parameters.
+     * @param ar String array to send.
+     * @return
+     */
     private  boolean send(String[] ar){
         if(isConnected || openConnection()){
             try {
@@ -238,6 +318,10 @@ public class Connection {
         }
     }
 
+    /**
+     * Receives information from the server in format of string arrays.
+     * @return response from the server
+     */
     private String[] receive(){
         if(isConnected){
             try{
@@ -251,12 +335,4 @@ public class Connection {
         }
         return null;
     }
-
-    public ObjectInputStream getIn(){
-        return this.in;
-    }
-    public ObjectOutputStream getOut(){
-        return this.out;
-    }
-
 }

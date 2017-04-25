@@ -73,6 +73,12 @@ public class Account implements Serializable {
         this.lastModified = lastModified;
     }
 
+    /**
+     * Substitutes real password with "*" symbols
+     * of appropriate length
+     * @param password
+     * @return
+     */
     private String maskPass(String password) {
         String output = "";
 

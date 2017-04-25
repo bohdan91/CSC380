@@ -14,9 +14,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.io.File;
 import java.io.IOException;
 
+/**Created by Bohdan Yevdokymov
+ *
+ * Controller class for login widow, manages logging in as
+ * well as registering a new user.
+ */
 public class LoginController {
 
     @FXML private PasswordField passField;
@@ -40,7 +44,10 @@ public class LoginController {
     private Scene createPanel;
     private Stage MainWindow;
 
-
+    /**
+     * If this window is initialized from main window -
+     * will autofill last used username
+     */
     @FXML
     public void initialize(){
         if(Main.fileManager != null) {
@@ -54,7 +61,11 @@ public class LoginController {
 
     }
 
-
+    /**
+     * When "Log In" button is pressed - checks the password,
+     * if it was correct initializes main window, if not highlights that
+     * either username or password is incorrect
+     */
     @FXML
     private void LogInPressed(){
 
@@ -95,8 +106,9 @@ public class LoginController {
     }
 
 
-
-
+    /**
+     * Initializes window with a form to register new user
+     */
     @FXML
     private void registerPressed(){
         this.newFileWindow = new Stage();
@@ -115,7 +127,12 @@ public class LoginController {
 
     }
 
-
+    /**
+     * Handles button from "Register new user" window
+     * Checks if username is at least 5 char long, password is
+     * at least 6 chars long, then checks if username is available
+     * if everything passes - registers new user on a server.
+     */
     @FXML
     private void createBtnPressed(){
         //Resetting all warnings
@@ -158,7 +175,7 @@ public class LoginController {
                 Stage stage = (Stage) createBtn.getScene().getWindow();
                 stage.close();
             } else {
-                passShortLabel.setText("username is already taken...");
+                userNameTooShort.setText("username is already taken...");
                 createName.setBorder(new Border(new BorderStroke(Color.CORAL, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
                 userNameTooShort.setVisible(true);
 
@@ -168,7 +185,9 @@ public class LoginController {
     }
 
 
-
+    /**
+     * Enables "Sign In" button only when username and at least 6 char password are entered
+     */
     @FXML
     private void setSignInBtn(){
         if(passField.getText().length() > 5 && userNameField.getText().length() > 4){
@@ -178,7 +197,11 @@ public class LoginController {
         }
     }
 
-
+    /**
+     * Converts a String to byte array.
+     * @param s String to convert
+     * @return byte array
+     */
     private byte[] toByte(String s){
         byte[] ar;
         ar = s.getBytes();

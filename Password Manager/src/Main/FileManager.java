@@ -16,9 +16,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 
-/**
- * Class for managing db files, reading, writing, encrypting, decrypting
+/** Created by Bohdan Yevdokymov
  *
+ * Class for managing connections, reading, writing, encrypting, decrypting
+ * Basically all of the backend functionality
  */
 public class FileManager {
 
@@ -31,7 +32,7 @@ public class FileManager {
     /**
      * Default constructor for file manager, key has to be checked
      * first using static tryOpen method
-     * @param username file with encrypted data
+     * @param username username to use
      * @param key correct encryption key for the file
      */
     public FileManager(String username, Key key, String dec){
@@ -53,16 +54,6 @@ public class FileManager {
 
             byte[] password = formatPassword(pas);
             Key key = generateKey(password);
-
-            /*
-            //if this line doesn't throw an exception - password is correct
-            //tryDecrypt(key, control);
-            if(checkPassword(file, key)) {
-
-                //at this point we know that password is correct
-                Main.fileManager = new FileManager(file, key);
-                Main.fileManager.load();
-            }*/
             Connection conn = Connection.getInstance();
             String enc = conn.getEncryptedId(username);
             String dec = tryDecrypt(key, enc);
@@ -90,33 +81,12 @@ public class FileManager {
         }
         return false;
     }
-    private static boolean checkPassword(File file, Key key){
-        //if file exist use it
-        if(file.exists()){
-            try{
-                BufferedReader br = new BufferedReader(new FileReader(file));
-                String control = br.readLine();
-                br.close();
-
-
-            } catch(FileNotFoundException e ){
-                e.printStackTrace();
-            } catch(IOException io){
-
-            }
-        } else{ //file doesn't exit - use server
-
-        }
-        return false;
-    }
-
-
 
     /**
-     * Creates new DB file using path, file name and password passed in parameters
-     * @param username name of db
+     *  Generates new unique ID for user, and registers a user on the server
+     * @param username username to register
      * @param pas unformatted password in byte array
-     * @return true if file was successfully created, false if error occurred
+     * @return true if user was successfully registered, false if error occurred
      */
     public static boolean registerUser(String username, byte[] pas){
         byte[] password =formatPassword(pas);
@@ -239,53 +209,13 @@ public class FileManager {
         return keyLength;
     }
 
+
     /**
-     * Saving accounts to the file
-     * first line unique identifier
-     * every other lines -> accounts formatted "title/userName/note/type/url/password/date"
-     * @return true if saving was successful, if not - false
+     * Converts an Account into formatted string and encrypts it using
+     * existing key. Usually is used to send account to the server as a String.
+     * @param ac Account to encrypt
+     * @return Encrypted String
      */
-   /* public boolean save(){
-        try {
-            FileWriter fw = new FileWriter("");
-            BufferedWriter out = new BufferedWriter(fw);
-            //System.out.println("Writess: " + uniqueId);
-            out.write(encrypt(uniqueId));
-            out.newLine();
-
-            for(Account ac : Main.accountTable.values()){
-                String s = "/title=" +ac.getTitle() + "/username=" + ac.getUserName() + "/comment=" + ac.getComment() + "/type=" + ac.getType();
-                s += "/url=" + ac.getURL() + "/password=" + ac.getPassword() + "/time=" + ac.getLastModified() + "/";
-
-                //this part encrypts string by pieces (read in encrypt description why)
-                //probably should be created in a separate method and called in public "encrypt" method
-                if(s.length() > 30){
-                    String t ="";
-                    int c = s.length() / 30;
-                    for(int i =0; i < c; i++){
-                            t += encrypt(s.substring(i * 30, (i + 1) * 30));
-                    }
-                    t += encrypt(s.substring(c * 30));
-                    s = t;
-
-                }else {
-                    s = encrypt(s);
-                }
-                //System.out.println("Writes: " + s);
-                out.write(s);
-                out.newLine();
-            }
-
-            out.close();
-            fw.close();
-            //System.out.println("Saved");
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    */
    private String encryptAccount(Account ac){
        try{
            String s = "/title=" + ac.getTitle() + "/username=" + ac.getUserName() + "/comment=" + ac.getComment() + "/type=" + ac.getType();
@@ -323,6 +253,12 @@ public class FileManager {
        return null;
    }
 
+    /**
+     * Saves new account to the server and if successful
+     * adds it to the main table
+     * @param ac Account to add
+     * @return
+     */
    public boolean insertAccount(Account ac){
 
            String s = encryptAccount(ac);
@@ -335,6 +271,12 @@ public class FileManager {
            }
    }
 
+    /**
+     * Method to use if while editing an account title was used
+     * @param oldTitle
+     * @param newTitle
+     * @return
+     */
    public boolean changeTitle(String oldTitle, String newTitle){
        Connection conn = Connection.getInstance();
        if(conn.changeTitle(uniqueId, oldTitle, newTitle)){
@@ -345,6 +287,12 @@ public class FileManager {
        }
    }
 
+    /**
+     * Updates information about the account and uploads it to the server
+     * as well as to main table
+     * @param ac Account to update
+     * @return
+     */
    public boolean updateAccount(Account ac){
        Connection conn = Connection.getInstance();
        if(conn.updateAccount(uniqueId, ac.getTitle(),encryptAccount(ac) )){
@@ -356,6 +304,11 @@ public class FileManager {
        }
    }
 
+    /**
+     * Removes an Account from the server
+     * @param ac
+     * @return
+     */
    public boolean deleteAccount(Account ac){
        Connection conn = Connection.getInstance();
        if(conn.deleteAccount(uniqueId, ac.getTitle())){
@@ -366,19 +319,12 @@ public class FileManager {
    }
 
     /**
-     * Reads accounts from the file and puts them into Main.accountTable
+     * Reads accounts from the server and puts them into Main.accountTable
      * every other lines -> accounts formatted "title/userName/note/type/url/password/date"
      * @return true if successfully read the file
      */
     public boolean load(){
         try {
-            /*FileReader fr = new FileReader(dbFile);
-            BufferedReader in = new BufferedReader(fr);
-
-            this.uniqueId = decrypt(in.readLine());
-
-            String line = in.readLine();
-            */
             Connection conn = Connection.getInstance();
             String[] accounts = conn.getAccounts(uniqueId);
 
@@ -394,11 +340,7 @@ public class FileManager {
 
                 s = t;
 
-
-                //System.out.println("s:"+ s);
-                //System.out.println(s.lastIndexOf("title=") + ", " + s.indexOf("/", s.lastIndexOf("title=")));
                 String title = s.substring(s.lastIndexOf("title=") + 6,s.indexOf("/", s.lastIndexOf("title=")));
-
 
                 String userName = s.substring(s.lastIndexOf("username=") + 9,s.indexOf("/", s.lastIndexOf("username=")));
 

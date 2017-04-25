@@ -14,7 +14,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by Bohdan on 2/23/17.
+ * Created by Bohdan Yevdokymov
  */
 public class AddAccountController {
 
@@ -30,6 +30,10 @@ public class AddAccountController {
     public static Account editAccount;
     //
 
+    /**
+     * Looks if it is edit account request and prefilles all
+     * information if needed.
+     */
     @FXML
     public void initialize(){
         if(editAccount != null){
@@ -52,6 +56,14 @@ public class AddAccountController {
         }
     }
 
+    /**
+     * Saves account back to main window controller.
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws IllegalBlockSizeException
+     * @throws NoSuchPaddingException
+     */
     @FXML
     private void createBtnPressed() throws InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, NoSuchPaddingException {
         //System.out.println(typeBox.getValue());
