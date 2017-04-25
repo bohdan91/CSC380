@@ -130,7 +130,7 @@ public class Connection {
 
     public boolean deleteAccount(String decID, String title){
         String[] request = new String[3];
-        request[0] = "removeAccount";
+        request[0] = "deleteAccount";
         request[1] = decID;
         request[2] = title;
         String[] response;
