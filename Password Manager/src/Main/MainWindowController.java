@@ -523,18 +523,19 @@ public class MainWindowController {
     @FXML
     public void start() throws Exception
     {
-    	double time = 0.01;
+    	double EPSILON = 0.0000005;
+    	int iterations = 3000;
     	
-    	final Task<Void> task = new Task<Void>()
+    	Task<Void> task = new Task<Void>()
     	{
-    		int seconds = 3000;
     		
 			@Override
-			protected Void call() throws Exception 
+			public Void call() throws Exception 
 			{
-				for (int i = 0; i < seconds; i++)
+				for (int i = 0; i < iterations; i++)
 				{
-					updateProgress(i + 1, seconds);
+					updateProgress(i + 1, iterations);
+					Thread.sleep(10);
 				}
 				return null;
 			}
@@ -544,9 +545,13 @@ public class MainWindowController {
     	
     	loadBar.progressProperty().addListener(observable -> 
     	{
-    		if (loadBar.getProgress() >= 1 - time)
+    		if (loadBar.getProgress() >= 1 - EPSILON)
     		{
-    			loadBar.setStyle("-fx-accent: lightgreen;");
+    			loadBar.setStyle("-fx-accent: green;");
+    		}
+    		else
+    		{
+    			loadBar.setStyle("-fx-accent: blue;");
     		}
     	});
     	
