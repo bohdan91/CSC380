@@ -73,21 +73,17 @@ public class Service extends Thread{
      * insertaccount :
      *      [0] = "insertaccount"
      *      [1] = uniqueID_dec
-     *      [2] = title
+     *      [2] = id
      *      [3] = enc (Encrypted account string)
      * deleteaccount :
      *      [0] = "deleteaccount"
      *      [1] = uniqueID_dec
-     *      [2] = title
+     *      [2] = id
      * updateaccount :
      *      [0] = "updateaccount"
      *      [1] = uniqueID_dec
-     *      [2] = title
+     *      [2] = id
      *      [3] = enc (Encrypted account string)
-     * istitleavailable
-     *      [0] = "istitleavailable"
-     *      [1] = uniqueID_dec
-     *      [2] = title
      */
     public void run(){
         try {
@@ -128,9 +124,6 @@ public class Service extends Thread{
                         break;
                     case "updateaccount":
                         updateAccount(recieved[1], recieved[2], recieved[3]);
-                        break;
-                    case "istitleavailable":
-                        checkTitle(recieved[1], recieved[2]);
                         break;
                 }
             } else {
@@ -321,6 +314,17 @@ public class Service extends Thread{
         }
     }
 
+    /**
+     * Insert Accounts
+     *
+     * Takes in the decID for username retrieval. Then it finds the next available number
+     * id to be used for the account. Once the username and account id are found, the accounts
+     * is inserted, and the client receives the account id.
+     *
+     * @param decID
+     * @param enc
+     * @throws IOException
+     */
     private void insertAccount(String decID, String enc) throws IOException{
         try{
             String user = getUser(decID);
@@ -348,13 +352,11 @@ public class Service extends Thread{
     }
 
     /**
-     * Insert Account
+     * Insert Account with id
      *
-     * Receives a decID, title, and encrypted account string.
-     * It uses the getUser(decID) method to retrieve the username from
-     * the database, and uses the username to store the account into
-     * the accounts table.
-     * It then returns true if the account was added, or false if it was not.
+     * It receives the username, id and enc, and inserts the account into
+     * the database.
+     * It then returns the id if the account was added, or 0 if it was not.
      *
      * @param user
      * @param id
@@ -382,7 +384,7 @@ public class Service extends Thread{
     /**
      * Delete Account
      *
-     * Recieves the decID, and title that the user desires to delete. It then processes
+     * Recieves the decID, and account id that the user desires to delete. It then processes
      * the sql request to remove the account. The function then writes out true or false
      * whether the account was deleted or not.
      *
@@ -412,7 +414,7 @@ public class Service extends Thread{
     /**
      * Update Account
      *
-     * It receives the decID, title, and encrypted account String.
+     * It receives the decID, account id, and encrypted account String.
      * It uses the getUser(decID) method to retrieve the username.
      * It then uses the username to update and existing account in the
      * account table.
@@ -439,55 +441,6 @@ public class Service extends Thread{
 
             log("Bad sql request as : " + e);
         }
-    }
-
-    /**
-     * Check Title
-     *
-     * It receives a decID, and a title to check.
-     * It receives a user id from the getUser(decID) method.
-     * It then proceeds to check the existence of the title.
-     * If the title exists, it returns false;
-     * if the title does not exist, it return true;
-     * This method can be used internally by other methods,
-     * or be used externally by the client.
-     *
-     * @param decID
-     * @param title
-     * @return boolean
-     */
-    private boolean checkTitle(String decID, String title){
-        try{
-            //Retrieve id
-            String id = getUser(decID);
-
-            //Check title
-            String sql = "SELECT 1 FROM accounts WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
-            Statement stmt = connect.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-
-            String r = rs.getString("1");
-            if (r.equals("1")){
-                try{
-                    out.writeObject(singleRespond("false"));
-                    return false;
-                }catch(IOException e){
-                    return false;
-                }
-            }
-        }catch(SQLException e){
-            try{
-                out.writeObject(singleRespond("true"));
-
-                log("Bad sql request as : " + e);
-                return true;
-            }catch(IOException i){
-
-                log("Bad sql request as : " + e);
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

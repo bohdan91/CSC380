@@ -11,8 +11,8 @@ import java.net.Socket;
  */
 public class Connection {
     private static Connection instance = null;
-    private static final String address = "127.0.0.1";
-    //private static final String address = "passman.ddns.net";
+    //private static final String address = "127.0.0.1";
+    private static final String address = "passman.ddns.net";
     private static final int port = 9898;
     private Socket socket;
     private static ObjectInputStream in;
