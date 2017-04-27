@@ -402,7 +402,8 @@ public class MainWindowController {
     }
 
     /**
-     * Opens an About window
+     * Opens an About window for new users to get started and familiar 
+     * using the application
      */
     @FXML
     private void helpAboutPressed()
@@ -431,6 +432,13 @@ public class MainWindowController {
         addWindow.show();
     }
     
+    /**
+     * Creates a treeView within the HelpAboutPressed stage and populates 
+     * it with information for new users to get started using the 
+     * application
+     * 
+     * @return the treeView to display on HelpAboutPressed stage
+     */
     public TreeView<String> helpWindowCreateTree()
     {
         TreeItem<String> root, branchA, branchB, branchC;
@@ -459,7 +467,7 @@ public class MainWindowController {
                 "account (Gaming_User123) \n\t\t\t   Password - to be secured for the account (Gaming_password)" +
                 "\n\t\t\t   URL - of the website/etc. to be saved (gaming.com) \n\t\t\t" +
                 "   Type - type of saved password for ease of finding (gaming)" +
-                "\n\t\t\t   Notes - for any extra information you need to save (trial expires xx/xx/xxxx " , branchA_2);
+                "\n\t\t\t   Notes - for any extra information you need to save (trial expires xx/xx/xxxx)" , branchA_2);
 
         //branchB
         branchB = makeBranch("Maintaining Your Database", root);
@@ -494,7 +502,14 @@ public class MainWindowController {
         return tree;
     }
     
-    //create treeBranches
+    /**
+     * Creates and returns the branches for the TreeView in 
+     * helpWindowCreateTree
+     * 
+     * @param title of the branch to be created
+     * @param parent of the branch to be created
+     * @return the TreeItem for helpWindowCreateTree TreeView
+     */
     public TreeItem<String> makeBranch(String title, TreeItem<String> parent)
     {
         TreeItem<String> item = new TreeItem<>(title);
@@ -503,6 +518,12 @@ public class MainWindowController {
         return item;
     }
     
+    /**
+     * Creates and returns an ImageView from specified location that can be 
+     * placed on helpAboutPressed stage 
+     * 
+     * @return the ImageView at the specified location
+     */
     public ImageView helpWindowImage()
     {
         final ImageView imv = new ImageView();
@@ -511,6 +532,12 @@ public class MainWindowController {
         return imv;
     }
     
+    /**
+     * Creates and returns a Text object to be placed on the 
+     * helpAboutPressed stage 
+     * 
+     * @return the Text object to be placed on helpAboutPressed stage
+     */
     public Text helpWindowText()
     {
         Text t = new Text();
@@ -520,6 +547,15 @@ public class MainWindowController {
         return t;
     }
     
+    /**
+     * Creates a Progress Bar to be shown when users copy their
+     * password, so that they can visually see how long they have
+     * until their password is cleared from the clipboard. It will
+     * increment with the color blue, then turn green when the task
+     * is complete and the clipboard is cleared. 
+     * 
+     * @throws Exception
+     */
     @FXML
     public void start() throws Exception
     {
