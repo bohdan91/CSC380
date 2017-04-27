@@ -1,7 +1,10 @@
+import javax.management.StandardEmitterMBean;
+import javax.swing.plaf.nimbus.State;
 import java.io.*;
 import java.net.*;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 /**
  * Created by Alex Voytovich
@@ -123,7 +126,7 @@ public class Service extends Thread{
                         getAccounts(recieved[1]);
                         break;
                     case "insertaccount":
-                        insertAccount(recieved[1], recieved[2], recieved[3]);
+                        insertAccount(recieved[1], recieved[2]);
                         break;
                     case "deleteaccount":
                         deleteAccount(recieved[1], recieved[2]);
@@ -297,10 +300,10 @@ public class Service extends Thread{
     private void getAccounts(String decID){
         try{
             //Retrieve id
-            String id = getUser(decID);
+            String user = getUser(decID);
 
             //Retrieve accounts
-            String sql = "SELECT enc FROM accounts WHERE user = \"" + id + "\"";
+            String sql = "SELECT id, enc FROM accounts WHERE user = \"" + user + "\"";
             Statement stmt = connect.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
 
@@ -308,9 +311,10 @@ public class Service extends Thread{
             while(rs.next()){
                 act.add(rs.getString("enc"));
             }
-            String[] response = new String[act.size()];
-            for(int i =0; i < act.size(); i++){
-                response[i] = act.get(i);
+            String[] response = new String[act.size() * 2];
+            for(int i = 0; i < act.size(); i += 2){
+                response[i] = act.get(i).substring(act.get(i).indexOf("|") + 1);
+                response[i + 1] = act.get(i).substring(0, act.get(i).indexOf("|"));
             }
             rs.close();
             stmt.close();
@@ -323,6 +327,28 @@ public class Service extends Thread{
         }
     }
 
+    private void insertAccount(String decID, String enc) throws IOException{
+        try{
+            String user = getUser(decID);
+
+            String sql = "SELECT id FROM accounts WHERE user = \"" + user + "\"";
+            Statement stmt = connect.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            TreeSet<Integer> tree = new TreeSet<>();
+            while(rs.next()){
+                tree.add(rs.getInt("id"));
+            }
+            int id = tree.last();
+            addAccId(user, id, enc);
+
+        }catch(SQLException e){
+            out.writeObject("0");
+
+            log("Bad sql request as " + e);
+        }
+    }
+
     /**
      * Insert Account
      *
@@ -332,29 +358,24 @@ public class Service extends Thread{
      * the accounts table.
      * It then returns true if the account was added, or false if it was not.
      *
-     * @param decID
-     * @param title
+     * @param user
+     * @param id
      * @param enc
      * @throws IOException
      */
-    private void insertAccount(String decID, String title, String enc) throws IOException{
+    private void addAccId(String user, int id, String enc) throws IOException{
         try {
-            //Retrieve id
-            String id = getUser(decID);
 
-            if (checkTitle(decID, title)) {
-                //Retrieve accounts
-                String sql = "INSERT INTO accounts values(\"" + id + "\", \"" + title + "\", \"" + enc + "\")";
-                Statement stmt = connect.createStatement();
-                stmt.execute(sql);
-                stmt.close();
+            //Retrieve accounts
+            String sql = "INSERT INTO accounts values(\"" + user + "\", " + id + ", \"" + enc + "\")";
+            Statement stmt = connect.createStatement();
+            stmt.execute(sql);
+            stmt.close();
 
-                out.writeObject(singleRespond("true"));
-            }else{
-                out.writeObject(singleRespond("false"));
-            }
+            out.writeObject(singleRespond("id"));
+
         }catch(SQLException e){
-            out.writeObject(singleRespond("false"));
+            out.writeObject(singleRespond("0"));
 
             log("Bad sql request as : " + e);
         }
