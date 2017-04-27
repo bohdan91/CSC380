@@ -23,6 +23,7 @@ public class Account implements Serializable {
     private String comment;
     private String type;
     private String URL;
+    private int    id;
     private long lastModified;
 
     /**
@@ -51,6 +52,7 @@ public class Account implements Serializable {
         this.type = type;
         this.URL = URL;
         this.lastModified = System.currentTimeMillis();
+        id = 0;
     }
 
     /**
@@ -148,6 +150,14 @@ public class Account implements Serializable {
         this.title = title;
         lastModified = System.currentTimeMillis();
 
+    }
+
+    public int getId(){
+        return id;
+    }
+
+    public void setId(int id){
+        this.id = id;
     }
 
     public String getMaskedPassword() {
