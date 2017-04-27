@@ -21,7 +21,7 @@ public class Main extends Application {
     public static FileManager fileManager;
     public static HashMap<String, Account> accountTable;
 
-    /**
+    /**1
      * Method that runs javaFX first login window
      * @param primaryStage initial window
      * @throws Exception
