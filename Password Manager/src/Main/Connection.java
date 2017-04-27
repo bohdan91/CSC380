@@ -142,41 +142,37 @@ public class Connection {
     /**
      * Adds new Account for the user.
      * @param dec identifier
-     * @param title title of account that is being added
      * @param enc formatted and encrypted
      * @return
      */
-    public boolean insertAccount(String dec, String title, String enc){
-        String[] request = new String[4];
+    public int insertAccount(String dec, String enc){
+        String[] request = new String[3];
         request[0] = "insertAccount";
         request[1] = dec;
-        request[2] = title;
-        request[3] = enc;
+        request[2] = enc;
         String[] response;
         if(openConnection()){
             if(send(request)){
                 response = receive();
-                if(response[0].equals("true")){
-                    closeConnection();
-                    return true;
-                }
+                closeConnection();
+                return Integer.parseInt(response[0]);
             }
             closeConnection();
         }
-        return false;
+        return 0;
     }
 
     /**
      * Method to remove specified account from the server
      * @param decID identifier
-     * @param title title of an account to remove
+     * @param id title of an account to remove
      * @return true if was removed
      */
-    public boolean deleteAccount(String decID, String title){
+    public boolean deleteAccount(String decID, int id){
         String[] request = new String[3];
         request[0] = "deleteAccount";
         request[1] = decID;
-        request[2] = title;
+        request[2] = Integer.toString(id);
         String[] response;
         if(openConnection()){
             if(send(request)){
@@ -194,15 +190,15 @@ public class Connection {
     /**
      * Updates an account information for specified user with specified title
      * @param decId identifier
-     * @param title title to update
+     * @param id title to update
      * @param enc String to replace old one
      * @return
      */
-    public boolean updateAccount(String decId, String title, String enc){
+    public boolean updateAccount(String decId, int id, String enc){
         String[] request = new String[4];
         request[0] = "updateAccount";
         request[1] = decId;
-        request[2] = title;
+        request[2] = Integer.toString(id);
         request[3] = enc;
         String[] response;
         if(openConnection()){
@@ -222,15 +218,15 @@ public class Connection {
      * Changes title to existing account on the server, needed to be done
      * before updating an account
      * @param decId identifier
-     * @param title old title to replace
+     * @param id old title to replace
      * @param newTitle new title to replace with
      * @return true if sucessful
      */
-    public boolean changeTitle(String decId, String title, String newTitle){
+    public boolean changeTitle(String decId, int id, String newTitle){
         String[] request = new String[4];
         request[0] = "changeTitle";
         request[1] = decId;
-        request[2] = title;
+        request[2] = Integer.toString(id);
         request[3] = newTitle;
         String[] response;
         if(openConnection()){

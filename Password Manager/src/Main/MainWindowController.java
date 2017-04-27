@@ -150,8 +150,6 @@ public class MainWindowController {
                     Main.accountTable.remove(oldTitle);
                 }
                 Main.fileManager.updateAccount(accountToAdd);
-                //Main.accountTable.remove(ac.getTitle());
-                //Main.accountTable.put(accountToAdd.getTitle(), accountToAdd);
                 accountToAdd = null;
                 populateTypeList();
             }
