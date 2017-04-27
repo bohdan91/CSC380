@@ -84,11 +84,6 @@ public class Service extends Thread{
      *      [1] = uniqueID_dec
      *      [2] = title
      *      [3] = enc (Encrypted account string)
-     * changetitle :
-     *      [0] = "changetitle"
-     *      [1] = uniqueID_dec
-     *      [2] = title
-     *      [3] = new title
      * istitleavailable
      *      [0] = "istitleavailable"
      *      [1] = uniqueID_dec
@@ -133,9 +128,6 @@ public class Service extends Thread{
                         break;
                     case "updateaccount":
                         updateAccount(recieved[1], recieved[2], recieved[3]);
-                        break;
-                    case "changetitle":
-                        changeTitle(recieved[1], recieved[2], recieved[3]);
                         break;
                     case "istitleavailable":
                         checkTitle(recieved[1], recieved[2]);
@@ -310,14 +302,16 @@ public class Service extends Thread{
             ArrayList<String> act = new ArrayList<>();
             while(rs.next()){
                 act.add(rs.getString("enc"));
-            }
-            String[] response = new String[act.size() * 2];
-            for(int i = 0; i < act.size(); i += 2){
-                response[i] = act.get(i).substring(act.get(i).indexOf("|") + 1);
-                response[i + 1] = act.get(i).substring(0, act.get(i).indexOf("|"));
+                act.add(rs.getString("id"));
             }
             rs.close();
             stmt.close();
+
+            String[] response = new String[act.size()];
+            for(int i = 0; i < act.size(); i++){
+                response[i] = act.get(i);
+            }
+
             out.writeObject(response);
         }catch(SQLException e){
             log("Bad sql request as : " + e);
@@ -339,8 +333,12 @@ public class Service extends Thread{
             while(rs.next()){
                 tree.add(rs.getInt("id"));
             }
-            int id = tree.last();
-            addAccId(user, id, enc);
+            if (tree.isEmpty()) {
+                addAccId(user, 1, enc);
+            }else{
+                int id = tree.last() + 1;
+                addAccId(user, id, enc);
+            }
 
         }catch(SQLException e){
             out.writeObject("0");
@@ -372,7 +370,7 @@ public class Service extends Thread{
             stmt.execute(sql);
             stmt.close();
 
-            out.writeObject(singleRespond("id"));
+            out.writeObject(singleRespond(Integer.toString(id)));
 
         }catch(SQLException e){
             out.writeObject(singleRespond("0"));
@@ -392,12 +390,12 @@ public class Service extends Thread{
      * @param title
      * @throws IOException
      */
-    private void deleteAccount(String decID, String title)throws IOException{
+    private void deleteAccount(String decID, String id)throws IOException{
         try{
             //Retrieve id
-            String id = getUser(decID);
+            String user = getUser(decID);
 
-            String sql = "DELETE FROM accounts WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
+            String sql = "DELETE FROM accounts WHERE user = \"" + user + "\" AND id = \"" + Integer.parseInt(id) + "\"";
             Statement stmt = connect.createStatement();
             stmt.execute(sql);
             stmt.close();
@@ -424,53 +422,18 @@ public class Service extends Thread{
      * @param enc
      * @throws IOException
      */
-    private void updateAccount(String decID, String title, String enc) throws IOException{
+    private void updateAccount(String decID, String id, String enc) throws IOException{
         try{
             //Retrieve id
-            String id = getUser(decID);
+            String user = getUser(decID);
 
             //Update info
-            String sql = "UPDATE accounts SET enc = \"" + enc + "\" WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
+            String sql = "UPDATE accounts SET enc = \"" + enc + "\" WHERE user = \"" + user + "\" AND id = \"" + Integer.parseInt(id) + "\"";
             Statement stmt = connect.createStatement();
             stmt.execute(sql);
             stmt.close();
 
             out.writeObject(singleRespond("true"));
-        }catch(SQLException e){
-            out.writeObject(singleRespond("false"));
-
-            log("Bad sql request as : " + e);
-        }
-    }
-
-    /**
-     * Change Account Title
-     *
-     * This class takes in a decID, title, and a new title.
-     * It uses the getUser(decID) method to retrieve the username.
-     * It then changes the title of an account.
-     *
-     * @param decID
-     * @param title
-     * @param newTitle
-     * @throws IOException
-     */
-    private void changeTitle(String decID, String title, String newTitle) throws IOException{
-        try{
-            //Retrieve id
-            String id = getUser(decID);
-
-            if (checkTitle(decID, newTitle)) {
-                //Update title
-                String sql = "UPDATE accounts SET title = \"" + newTitle + "\" WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
-                Statement stmt = connect.createStatement();
-                stmt.execute(sql);
-                stmt.close();
-
-                out.writeObject(singleRespond("true"));
-            }else{
-                out.writeObject(singleRespond("false"));
-            }
         }catch(SQLException e){
             out.writeObject(singleRespond("false"));
 
