@@ -1,11 +1,4 @@
 *.class
 .idea
-.db
-
-Password Manager/abc.db
-
-*.db
-
 *.iml
-
 *.zip
