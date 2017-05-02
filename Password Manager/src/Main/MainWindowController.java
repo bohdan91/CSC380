@@ -595,6 +595,7 @@ public class MainWindowController {
     	thread.setDaemon(true);
     	thread.start();
     }
+
     
 }
 

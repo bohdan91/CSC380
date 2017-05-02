@@ -1,10 +1,7 @@
 package Main;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import javax.crypto.BadPaddingException;
@@ -67,7 +64,20 @@ public class AddAccountController {
     @FXML
     private void createBtnPressed() throws InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, NoSuchPaddingException {
         //System.out.println(typeBox.getValue());
-        if(title.getText() != null) {
+        if(title.getText().length() < 1) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Title");
+            alert.setHeaderText(null);
+            alert.setContentText("Title cannot be empty !");
+            alert.showAndWait();
+        }else if(!title.getText().equals(editAccount.getTitle()) && Main.accountTable.containsKey(title.getText())) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Title");
+            alert.setHeaderText(null);
+            alert.setContentText("Title already exists !");
+            alert.showAndWait();
+        }else
+        {
             Account newAccount = new Account(title.getText(), userName.getText(), passField.getText(), note.getText(), (String) typeBox.getValue(), url.getText());
 
             MainWindowController.accountToAdd = newAccount;
