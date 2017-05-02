@@ -263,7 +263,9 @@ public class FileManager {
 
            String s = encryptAccount(ac);
            Connection conn = Connection.getInstance();
-           if(conn.insertAccount(uniqueId, ac.getTitle(), s)){
+           int id = conn.insertAccount(uniqueId, s);
+           if(id != 0){
+               ac.setId(id);
                Main.accountTable.put(ac.getTitle(), ac);
                return true;
            }else{
@@ -271,21 +273,19 @@ public class FileManager {
            }
    }
 
-    /**
+
+   /**
      * Method to use if while editing an account title was used
      * @param oldTitle
      * @param newTitle
      * @return
      */
    public boolean changeTitle(String oldTitle, String newTitle){
-       Connection conn = Connection.getInstance();
-       if(conn.changeTitle(uniqueId, oldTitle, newTitle)){
            Main.accountTable.get(oldTitle).setTitle(newTitle);
            return true;
-       } else {
-           return false;
-       }
    }
+
+
 
     /**
      * Updates information about the account and uploads it to the server
@@ -295,7 +295,7 @@ public class FileManager {
      */
    public boolean updateAccount(Account ac){
        Connection conn = Connection.getInstance();
-       if(conn.updateAccount(uniqueId, ac.getTitle(),encryptAccount(ac) )){
+       if(conn.updateAccount(uniqueId, ac.getId(),encryptAccount(ac) )){
            Main.accountTable.remove(ac.getTitle());
            Main.accountTable.put(ac.getTitle(), ac);
            return true;
@@ -311,7 +311,7 @@ public class FileManager {
      */
    public boolean deleteAccount(Account ac){
        Connection conn = Connection.getInstance();
-       if(conn.deleteAccount(uniqueId, ac.getTitle())){
+       if(conn.deleteAccount(uniqueId, ac.getId())){
            return true;
        } else {
            return false;
@@ -328,7 +328,9 @@ public class FileManager {
             Connection conn = Connection.getInstance();
             String[] accounts = conn.getAccounts(uniqueId);
 
-            for(String line : accounts){
+            //for(String line : accounts){
+            for(int k = 0; k < accounts.length; k += 2){
+                String line = accounts[k];
                 String s = line;
                 s = decrypt(s);
                 String t ="";
@@ -355,6 +357,8 @@ public class FileManager {
                 long lastModified = Long.valueOf(s.substring(s.lastIndexOf("time=") + 5, s.indexOf("/",s.lastIndexOf("time=") )));
 
                 Account ac = new Account(title, userName, password, note, type, url, lastModified);
+
+                ac.setId(Integer.parseInt(accounts[k+1]));
 
                 Main.accountTable.put(title, ac);
 

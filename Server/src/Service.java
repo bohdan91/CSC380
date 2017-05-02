@@ -1,7 +1,10 @@
+import javax.management.StandardEmitterMBean;
+import javax.swing.plaf.nimbus.State;
 import java.io.*;
 import java.net.*;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 /**
  * Created by Alex Voytovich
@@ -70,26 +73,17 @@ public class Service extends Thread{
      * insertaccount :
      *      [0] = "insertaccount"
      *      [1] = uniqueID_dec
-     *      [2] = title
+     *      [2] = id
      *      [3] = enc (Encrypted account string)
      * deleteaccount :
      *      [0] = "deleteaccount"
      *      [1] = uniqueID_dec
-     *      [2] = title
+     *      [2] = id
      * updateaccount :
      *      [0] = "updateaccount"
      *      [1] = uniqueID_dec
-     *      [2] = title
+     *      [2] = id
      *      [3] = enc (Encrypted account string)
-     * changetitle :
-     *      [0] = "changetitle"
-     *      [1] = uniqueID_dec
-     *      [2] = title
-     *      [3] = new title
-     * istitleavailable
-     *      [0] = "istitleavailable"
-     *      [1] = uniqueID_dec
-     *      [2] = title
      */
     public void run(){
         try {
@@ -123,19 +117,13 @@ public class Service extends Thread{
                         getAccounts(recieved[1]);
                         break;
                     case "insertaccount":
-                        insertAccount(recieved[1], recieved[2], recieved[3]);
+                        insertAccount(recieved[1], recieved[2]);
                         break;
                     case "deleteaccount":
                         deleteAccount(recieved[1], recieved[2]);
                         break;
                     case "updateaccount":
                         updateAccount(recieved[1], recieved[2], recieved[3]);
-                        break;
-                    case "changetitle":
-                        changeTitle(recieved[1], recieved[2], recieved[3]);
-                        break;
-                    case "istitleavailable":
-                        checkTitle(recieved[1], recieved[2]);
                         break;
                 }
             } else {
@@ -297,23 +285,26 @@ public class Service extends Thread{
     private void getAccounts(String decID){
         try{
             //Retrieve id
-            String id = getUser(decID);
+            String user = getUser(decID);
 
             //Retrieve accounts
-            String sql = "SELECT enc FROM accounts WHERE user = \"" + id + "\"";
+            String sql = "SELECT id, enc FROM accounts WHERE user = \"" + user + "\"";
             Statement stmt = connect.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
 
             ArrayList<String> act = new ArrayList<>();
             while(rs.next()){
                 act.add(rs.getString("enc"));
-            }
-            String[] response = new String[act.size()];
-            for(int i =0; i < act.size(); i++){
-                response[i] = act.get(i);
+                act.add(rs.getString("id"));
             }
             rs.close();
             stmt.close();
+
+            String[] response = new String[act.size()];
+            for(int i = 0; i < act.size(); i++){
+                response[i] = act.get(i);
+            }
+
             out.writeObject(response);
         }catch(SQLException e){
             log("Bad sql request as : " + e);
@@ -324,37 +315,67 @@ public class Service extends Thread{
     }
 
     /**
-     * Insert Account
+     * Insert Accounts
      *
-     * Receives a decID, title, and encrypted account string.
-     * It uses the getUser(decID) method to retrieve the username from
-     * the database, and uses the username to store the account into
-     * the accounts table.
-     * It then returns true if the account was added, or false if it was not.
+     * Takes in the decID for username retrieval. Then it finds the next available number
+     * id to be used for the account. Once the username and account id are found, the accounts
+     * is inserted, and the client receives the account id.
      *
      * @param decID
-     * @param title
      * @param enc
      * @throws IOException
      */
-    private void insertAccount(String decID, String title, String enc) throws IOException{
-        try {
-            //Retrieve id
-            String id = getUser(decID);
+    private void insertAccount(String decID, String enc) throws IOException{
+        try{
+            String user = getUser(decID);
 
-            if (checkTitle(decID, title)) {
-                //Retrieve accounts
-                String sql = "INSERT INTO accounts values(\"" + id + "\", \"" + title + "\", \"" + enc + "\")";
-                Statement stmt = connect.createStatement();
-                stmt.execute(sql);
-                stmt.close();
+            String sql = "SELECT id FROM accounts WHERE user = \"" + user + "\"";
+            Statement stmt = connect.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
 
-                out.writeObject(singleRespond("true"));
-            }else{
-                out.writeObject(singleRespond("false"));
+            TreeSet<Integer> tree = new TreeSet<>();
+            while(rs.next()){
+                tree.add(rs.getInt("id"));
             }
+            if (tree.isEmpty()) {
+                addAccId(user, 1, enc);
+            }else{
+                int id = tree.last() + 1;
+                addAccId(user, id, enc);
+            }
+
         }catch(SQLException e){
-            out.writeObject(singleRespond("false"));
+            out.writeObject("0");
+
+            log("Bad sql request as " + e);
+        }
+    }
+
+    /**
+     * Insert Account with id
+     *
+     * It receives the username, id and enc, and inserts the account into
+     * the database.
+     * It then returns the id if the account was added, or 0 if it was not.
+     *
+     * @param user
+     * @param id
+     * @param enc
+     * @throws IOException
+     */
+    private void addAccId(String user, int id, String enc) throws IOException{
+        try {
+
+            //Retrieve accounts
+            String sql = "INSERT INTO accounts values(\"" + user + "\", " + id + ", \"" + enc + "\")";
+            Statement stmt = connect.createStatement();
+            stmt.execute(sql);
+            stmt.close();
+
+            out.writeObject(singleRespond(Integer.toString(id)));
+
+        }catch(SQLException e){
+            out.writeObject(singleRespond("0"));
 
             log("Bad sql request as : " + e);
         }
@@ -363,7 +384,7 @@ public class Service extends Thread{
     /**
      * Delete Account
      *
-     * Recieves the decID, and title that the user desires to delete. It then processes
+     * Recieves the decID, and account id that the user desires to delete. It then processes
      * the sql request to remove the account. The function then writes out true or false
      * whether the account was deleted or not.
      *
@@ -371,12 +392,12 @@ public class Service extends Thread{
      * @param title
      * @throws IOException
      */
-    private void deleteAccount(String decID, String title)throws IOException{
+    private void deleteAccount(String decID, String id)throws IOException{
         try{
             //Retrieve id
-            String id = getUser(decID);
+            String user = getUser(decID);
 
-            String sql = "DELETE FROM accounts WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
+            String sql = "DELETE FROM accounts WHERE user = \"" + user + "\" AND id = \"" + Integer.parseInt(id) + "\"";
             Statement stmt = connect.createStatement();
             stmt.execute(sql);
             stmt.close();
@@ -393,7 +414,7 @@ public class Service extends Thread{
     /**
      * Update Account
      *
-     * It receives the decID, title, and encrypted account String.
+     * It receives the decID, account id, and encrypted account String.
      * It uses the getUser(decID) method to retrieve the username.
      * It then uses the username to update and existing account in the
      * account table.
@@ -403,13 +424,13 @@ public class Service extends Thread{
      * @param enc
      * @throws IOException
      */
-    private void updateAccount(String decID, String title, String enc) throws IOException{
+    private void updateAccount(String decID, String id, String enc) throws IOException{
         try{
             //Retrieve id
-            String id = getUser(decID);
+            String user = getUser(decID);
 
             //Update info
-            String sql = "UPDATE accounts SET enc = \"" + enc + "\" WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
+            String sql = "UPDATE accounts SET enc = \"" + enc + "\" WHERE user = \"" + user + "\" AND id = \"" + Integer.parseInt(id) + "\"";
             Statement stmt = connect.createStatement();
             stmt.execute(sql);
             stmt.close();
@@ -420,90 +441,6 @@ public class Service extends Thread{
 
             log("Bad sql request as : " + e);
         }
-    }
-
-    /**
-     * Change Account Title
-     *
-     * This class takes in a decID, title, and a new title.
-     * It uses the getUser(decID) method to retrieve the username.
-     * It then changes the title of an account.
-     *
-     * @param decID
-     * @param title
-     * @param newTitle
-     * @throws IOException
-     */
-    private void changeTitle(String decID, String title, String newTitle) throws IOException{
-        try{
-            //Retrieve id
-            String id = getUser(decID);
-
-            if (checkTitle(decID, newTitle)) {
-                //Update title
-                String sql = "UPDATE accounts SET title = \"" + newTitle + "\" WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
-                Statement stmt = connect.createStatement();
-                stmt.execute(sql);
-                stmt.close();
-
-                out.writeObject(singleRespond("true"));
-            }else{
-                out.writeObject(singleRespond("false"));
-            }
-        }catch(SQLException e){
-            out.writeObject(singleRespond("false"));
-
-            log("Bad sql request as : " + e);
-        }
-    }
-
-    /**
-     * Check Title
-     *
-     * It receives a decID, and a title to check.
-     * It receives a user id from the getUser(decID) method.
-     * It then proceeds to check the existence of the title.
-     * If the title exists, it returns false;
-     * if the title does not exist, it return true;
-     * This method can be used internally by other methods,
-     * or be used externally by the client.
-     *
-     * @param decID
-     * @param title
-     * @return boolean
-     */
-    private boolean checkTitle(String decID, String title){
-        try{
-            //Retrieve id
-            String id = getUser(decID);
-
-            //Check title
-            String sql = "SELECT 1 FROM accounts WHERE user = \"" + id + "\" AND title = \"" + title + "\"";
-            Statement stmt = connect.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-
-            String r = rs.getString("1");
-            if (r.equals("1")){
-                try{
-                    out.writeObject(singleRespond("false"));
-                    return false;
-                }catch(IOException e){
-                    return false;
-                }
-            }
-        }catch(SQLException e){
-            try{
-                out.writeObject(singleRespond("true"));
-
-                log("Bad sql request as : " + e);
-                return true;
-            }catch(IOException i){
-
-                log("Bad sql request as : " + e);
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
