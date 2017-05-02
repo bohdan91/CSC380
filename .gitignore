@@ -9,3 +9,5 @@ Password Manager/abc.db
 *.iml
 
 *.zip
+
+Server/test.db
