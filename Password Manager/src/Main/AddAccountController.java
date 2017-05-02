@@ -70,12 +70,6 @@ public class AddAccountController {
             alert.setHeaderText(null);
             alert.setContentText("Title cannot be empty !");
             alert.showAndWait();
-        }else if(!title.getText().equals(editAccount.getTitle()) && Main.accountTable.containsKey(title.getText())) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Title");
-            alert.setHeaderText(null);
-            alert.setContentText("Title already exists !");
-            alert.showAndWait();
         }else
         {
             Account newAccount = new Account(title.getText(), userName.getText(), passField.getText(), note.getText(), (String) typeBox.getValue(), url.getText());
