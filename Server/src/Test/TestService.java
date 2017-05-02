@@ -1,16 +1,19 @@
 package Test;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.sql.*;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class TestService 
 {
@@ -85,14 +88,7 @@ public class TestService
 		String[] input = (String[])in.readObject();
 		Assert.assertEquals("true", input[0]);
 	}
-	
-	@Test
-	public void CheckIDTest()
-	{
-		String userID = "UserID789";
-		String decID = "testID";
-		ServerTestClient.testCheckID(userID, decID);
-	}
+
 	
 	@Test
 	public void GetEncryptedTest() throws IOException, ClassNotFoundException

@@ -13,8 +13,8 @@ public class Connection {
     private static Connection instance = null;
     //private static final String address = "127.0.0.1";
 
-    private static final String address = "172.20.10.6";
-    //private static final String address = "passman.ddns.net";
+    //private static String address = "172.20.10.6";
+    private static String address = "passman.ddns.net";
 
     private static final int port = 9898;
     private Socket socket;
@@ -333,5 +333,9 @@ public class Connection {
             }
         }
         return null;
+    }
+
+    public void setIP(String ip){
+        this.address = ip;
     }
 }

@@ -216,7 +216,7 @@ public class FileManager {
      * @param ac Account to encrypt
      * @return Encrypted String
      */
-   private String encryptAccount(Account ac){
+   public String encryptAccount(Account ac){
        try{
            String s = "/title=" + ac.getTitle() + "/username=" + ac.getUserName() + "/comment=" + ac.getComment() + "/type=" + ac.getType();
            s += "/url=" + ac.getURL() + "/password=" + ac.getPassword() + "/time=" + ac.getLastModified() + "/";
@@ -327,42 +327,43 @@ public class FileManager {
         try {
             Connection conn = Connection.getInstance();
             String[] accounts = conn.getAccounts(uniqueId);
-
-            //for(String line : accounts){
-            for(int k = 0; k < accounts.length; k += 2){
-                String line = accounts[k];
-                String s = line;
-                s = decrypt(s);
-                String t ="";
-                for(int i = 0; i < s.length(); i++){
-                    if((int)s.charAt(i) != 2){
-                        t += s.charAt(i);
+            if(accounts != null) {
+                //for(String line : accounts){
+                for (int k = 0; k < accounts.length; k += 2) {
+                    String line = accounts[k];
+                    String s = line;
+                    s = decrypt(s);
+                    String t = "";
+                    for (int i = 0; i < s.length(); i++) {
+                        if ((int) s.charAt(i) != 2) {
+                            t += s.charAt(i);
+                        }
                     }
+
+                    s = t;
+
+                    String title = s.substring(s.lastIndexOf("title=") + 6, s.indexOf("/", s.lastIndexOf("title=")));
+
+                    String userName = s.substring(s.lastIndexOf("username=") + 9, s.indexOf("/", s.lastIndexOf("username=")));
+
+                    String note = s.substring(s.lastIndexOf("comment=") + 8, s.indexOf("/", s.lastIndexOf("comment=")));
+
+                    String type = s.substring(s.lastIndexOf("type=") + 5, s.indexOf("/", s.lastIndexOf("type=")));
+
+                    String url = s.substring(s.lastIndexOf("url=") + 4, s.indexOf("/", s.lastIndexOf("url=")));
+
+                    String password = s.substring(s.lastIndexOf("password=") + 9, s.indexOf("/", s.lastIndexOf("password=")));
+
+                    long lastModified = Long.valueOf(s.substring(s.lastIndexOf("time=") + 5, s.indexOf("/", s.lastIndexOf("time="))));
+
+                    Account ac = new Account(title, userName, password, note, type, url, lastModified);
+
+                    ac.setId(Integer.parseInt(accounts[k + 1]));
+
+                    Main.accountTable.put(title, ac);
+
+
                 }
-
-                s = t;
-
-                String title = s.substring(s.lastIndexOf("title=") + 6,s.indexOf("/", s.lastIndexOf("title=")));
-
-                String userName = s.substring(s.lastIndexOf("username=") + 9,s.indexOf("/", s.lastIndexOf("username=")));
-
-                String note  = s.substring(s.lastIndexOf("comment=") + 8,s.indexOf("/", s.lastIndexOf("comment=")));
-
-                String type = s.substring(s.lastIndexOf("type=") + 5,s.indexOf("/", s.lastIndexOf("type=")));
-
-                String url = s.substring(s.lastIndexOf("url=") + 4,s.indexOf("/", s.lastIndexOf("url=")));
-
-                String password = s.substring(s.lastIndexOf("password=") + 9, s.indexOf("/", s.lastIndexOf("password=")));
-
-                long lastModified = Long.valueOf(s.substring(s.lastIndexOf("time=") + 5, s.indexOf("/",s.lastIndexOf("time=") )));
-
-                Account ac = new Account(title, userName, password, note, type, url, lastModified);
-
-                ac.setId(Integer.parseInt(accounts[k+1]));
-
-                Main.accountTable.put(title, ac);
-
-
             }
 
 
