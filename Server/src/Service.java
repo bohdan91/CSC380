@@ -19,7 +19,7 @@ import java.util.TreeSet;
  *
  * tables:
  * users(user text UNIQUE PRIMARY KEY, uniqueID_enc text, uniqueID_dec text)
- * accounts(user text primarykey, title text, enc text)
+ * accounts(user text primarykey, id int, enc text)
  */
 public class Service extends Thread{
     private Socket socket;
@@ -73,8 +73,7 @@ public class Service extends Thread{
      * insertaccount :
      *      [0] = "insertaccount"
      *      [1] = uniqueID_dec
-     *      [2] = id
-     *      [3] = enc (Encrypted account string)
+     *      [2] = enc (Encrypted account string)
      * deleteaccount :
      *      [0] = "deleteaccount"
      *      [1] = uniqueID_dec
@@ -328,6 +327,9 @@ public class Service extends Thread{
     private void insertAccount(String decID, String enc) throws IOException{
         try{
             String user = getUser(decID);
+            if (user == null){
+                out.writeObject(singleRespond("0"));
+            }
 
             String sql = "SELECT id FROM accounts WHERE user = \"" + user + "\"";
             Statement stmt = connect.createStatement();
@@ -389,7 +391,7 @@ public class Service extends Thread{
      * whether the account was deleted or not.
      *
      * @param decID
-     * @param title
+     * @param id
      * @throws IOException
      */
     private void deleteAccount(String decID, String id)throws IOException{
@@ -420,7 +422,7 @@ public class Service extends Thread{
      * account table.
      *
      * @param decID
-     * @param title
+     * @param id
      * @param enc
      * @throws IOException
      */
