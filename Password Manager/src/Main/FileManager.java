@@ -216,7 +216,7 @@ public class FileManager {
      * @param ac Account to encrypt
      * @return Encrypted String
      */
-   private String encryptAccount(Account ac){
+   public String encryptAccount(Account ac){
        try{
            String s = "/title=" + ac.getTitle() + "/username=" + ac.getUserName() + "/comment=" + ac.getComment() + "/type=" + ac.getType();
            s += "/url=" + ac.getURL() + "/password=" + ac.getPassword() + "/time=" + ac.getLastModified() + "/";
