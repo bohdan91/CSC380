@@ -285,6 +285,10 @@ public class Service extends Thread{
         try{
             //Retrieve id
             String user = getUser(decID);
+            if (user == null){
+                out.writeObject(singleRespond("false"));
+                return;
+            }
 
             //Retrieve accounts
             String sql = "SELECT id, enc FROM accounts WHERE user = \"" + user + "\"";
@@ -329,6 +333,7 @@ public class Service extends Thread{
             String user = getUser(decID);
             if (user == null){
                 out.writeObject(singleRespond("0"));
+                return;
             }
 
             String sql = "SELECT id FROM accounts WHERE user = \"" + user + "\"";
@@ -398,6 +403,10 @@ public class Service extends Thread{
         try{
             //Retrieve id
             String user = getUser(decID);
+            if (user == null) {
+                out.writeObject(singleRespond("false"));
+                return;
+            }
 
             String sql = "DELETE FROM accounts WHERE user = \"" + user + "\" AND id = \"" + Integer.parseInt(id) + "\"";
             Statement stmt = connect.createStatement();
@@ -430,6 +439,10 @@ public class Service extends Thread{
         try{
             //Retrieve id
             String user = getUser(decID);
+            if (user == null) {
+                out.writeObject(singleRespond("false"));
+                return;
+            }
 
             //Update info
             String sql = "UPDATE accounts SET enc = \"" + enc + "\" WHERE user = \"" + user + "\" AND id = \"" + Integer.parseInt(id) + "\"";

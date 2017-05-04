@@ -1,22 +1,9 @@
 package Test;
 
-import java.io.File;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.sql.*;
-
 import org.junit.*;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.*;
+import java.net.*;
+import java.sql.*;
 
 public class TestService 
 {
@@ -32,6 +19,8 @@ public class TestService
 	static String act1 = "ThisIsAnAccount";
 	static String act2 = "ThisIsAnotherAccount";
 	static String act3 = "ThisIsTheLastAccount";
+	static String act4 = "ThisAccountWillBeDeleted";
+	static String act5 = "ThisAccountWillBeUpdated";
 
     @BeforeClass
     public static void buildTables()throws SQLException{
@@ -41,11 +30,15 @@ public class TestService
         String sql2 = "INSERT INTO accounts values(\"" + user + "\", " + 1 + ", \"" + act1 + "\")";
         String sql3 = "INSERT INTO accounts values(\"" + user + "\", " + 2 + ", \"" + act2 + "\")";
         String sql4 = "INSERT INTO accounts values(\"" + user + "\", " + 3 + ", \"" + act3 + "\")";
+        String sql5 = "INSERT INTO accounts values(\"" + user + "\", " + 4 + ", \"" + act4 + "\")";
+        String sql6 = "INSERT INTO accounts values(\"" + user + "\", " + 5 + ", \"" + act5 + "\")";
         Statement stmt = connect.createStatement();
         stmt.execute(sql1);
         stmt.execute(sql2);
         stmt.execute(sql3);
         stmt.execute(sql4);
+        stmt.execute(sql5);
+        stmt.execute(sql6);
         stmt.close();
     }
 
@@ -160,7 +153,7 @@ public class TestService
         String[] output = {"insertaccount", decID, "ThisIsAnotherTestAccount"};
         out.writeObject(output);
         String[] input = (String[])in.readObject();
-        Assert.assertTrue(input[0].equals("4"));
+        Assert.assertTrue(input[0].equals("6"));
     }
 
     @Test
@@ -171,4 +164,35 @@ public class TestService
         Assert.assertTrue(input[0].equals("0"));
     }
 
+    @Test
+    public void deleteaccountsTest_POsitive() throws IOException, ClassNotFoundException {
+        String[] output = {"deleteaccount", decID, "4"};
+        out.writeObject(output);
+        String[] input = (String[])in.readObject();
+        Assert.assertTrue(input[0].equals("true"));
+    }
+
+    @Test
+    public void deleteaccountsTest_Negetave()throws IOException, ClassNotFoundException{
+        String[] output = {"deleteaccount", "132435", "4"};
+        out.writeObject(output);
+        String[] input = (String[])in.readObject();
+        Assert.assertTrue(input[0].equals("false"));
+    }
+
+    @Test
+    public void updateaccountsTest_Positive()throws IOException, ClassNotFoundException{
+        String[] output = {"updateaccount", decID, "5", "ThisIsUpdatedInfo"};
+        out.writeObject(output);
+        String[] input = (String[])in.readObject();
+        Assert.assertTrue(input[0].equals("true"));
+    }
+
+    @Test
+    public void updateaccountsTest_Negetive()throws IOException, ClassNotFoundException{
+        String[] output = {"updateaccount", "132435", "6", "ThisIsUpdatedInfo"};
+        out.writeObject(output);
+        String[] input = (String[])in.readObject();
+        Assert.assertTrue(input[0].equals("false"));
+    }
 }
