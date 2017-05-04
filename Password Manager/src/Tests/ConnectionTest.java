@@ -1,4 +1,6 @@
-//import Main.Connection;
+package Tests;
+
+import Main.Connection;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,15 +12,14 @@ import java.net.UnknownHostException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Connection;
 
 import org.junit.Test;
 import org.junit.*;
 import java.sql.*;
 
-public class ConnectionTest 
+public class ConnectionTest
 {
-	static Connection conn;
+	static java.sql.Connection conn;
 	static Main.Connection connection = Main.Connection.getInstance();
 	static final String address = "127.0.0.1";
 	static final int port = 9898;
@@ -32,21 +33,24 @@ public class ConnectionTest
 	static String account1 = "1_TestAccount";
 	static String account2 = "2_TestAccount";
 	static String account3 = "3_TestAccount";
+	static String account4 = "ThisWillChange";
 
 	@BeforeClass
 	public static void beforeClassCreateTables() throws SQLException
 	{
-		String url = "jdbc:sqlite:" + "/users/marcusgiarrusso/documents/workspace2/csc380/server" + "/test.db";
+		String url = "jdbc:sqlite:" + System.getProperty("user.dir") + File.separator + ".." + File.separator + "Server" + File.separator + "test.db";
 		conn = DriverManager.getConnection(url);
 		String stmt_1 = "INSERT INTO users values(\"" + userID + "\", \"" + encID + "\", \"" + decID + "\")";
 		String stmt_2 = "INSERT INTO accounts values(\"" + userID + "\", " + 1 + ", \"" + account1 + "\")";
         String stmt_3 = "INSERT INTO accounts values(\"" + userID + "\", " + 2 + ", \"" + account2 + "\")";
         String stmt_4 = "INSERT INTO accounts values(\"" + userID + "\", " + 3 + ", \"" + account3 + "\")";
+        String stmt_5 = "INSERT INTO accounts values(\"" + userID + "\", " + 4 + ", \"" + account4 + "\")";
         Statement stmt = conn.createStatement();
-        stmt.executeQuery(stmt_1);
+        stmt.execute(stmt_1);
         stmt.execute(stmt_2);
         stmt.execute(stmt_3);
         stmt.execute(stmt_4);
+        stmt.execute(stmt_5);
         stmt.close();
 	}
 	
@@ -54,7 +58,7 @@ public class ConnectionTest
 	public static void afterClassClearTables() throws SQLException, IOException
 	{
 		String users_sql = "DELETE FROM users";
-		String accounts_sql = "DELECT FROM accounts";
+		String accounts_sql = "DELETE FROM accounts";
 		Statement stmt = conn.createStatement();
 		stmt.execute(users_sql);
 		stmt.execute(accounts_sql);
@@ -98,15 +102,16 @@ public class ConnectionTest
 	public void testGetAccounts()
 	{
 		String[] response = connection.getAccounts(decID);
-		String[] accounts = {account1, account2, account3};
-		Assert.assertEquals(accounts, response);
+		Assert.assertEquals(account1, response[0]);
+		Assert.assertEquals(account2, response[2]);
+		Assert.assertEquals(account3, response[4]);
 	}
 	
 	@Test
 	public void testInsertAccount()
 	{
 		int response = connection.insertAccount(decID, encID);
-		Assert.assertEquals(0, response);
+		Assert.assertEquals(5, response);
 	}
 	
 	@Test
@@ -119,14 +124,7 @@ public class ConnectionTest
 	@Test
 	public void testUpdateAccount()
 	{
-		boolean response = connection.updateAccount(decID, 1, encID);
-		Assert.assertEquals(true, response);
-	}
-
-	@Test
-	public void testChangeTitle()
-	{
-		boolean response = connection.changeTitle(decID, 1, "NewTitle");
+		boolean response = connection.updateAccount(decID, 4, "This is changed");
 		Assert.assertEquals(true, response);
 	}
 	
