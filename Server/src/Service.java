@@ -27,18 +27,20 @@ public class Service extends Thread{
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private Connection connect;
+    private String db;
 
     /**
      * Constructor for Service class
      *
      * @param socket
      * @param clientNumber
-     * @param connect
+     * @param db
      */
-    public Service(Socket socket, int clientNumber, Connection connect) {
+    public Service(Socket socket, int clientNumber, String db) {
+        connect = null;
+        this.db = db;
         this.socket = socket;
         this.clientNumber = clientNumber;
-        this.connect = connect;
         log("New connection with client# " + clientNumber + " at " + socket);
     }
 
@@ -85,8 +87,9 @@ public class Service extends Thread{
      *      [3] = enc (Encrypted account string)
      */
     public void run(){
-        try {
-
+        try(Connection connect = DriverManager.getConnection(db))
+        {
+            this.connect = connect;
             in = new ObjectInputStream(socket.getInputStream());
             out = new ObjectOutputStream(socket.getOutputStream());
 
@@ -136,6 +139,8 @@ public class Service extends Thread{
             log("ERROR  " + e);
         } catch(ClassNotFoundException e){
             log("WRONG OBJECT WAS RECIEVED\n" + e);
+        }catch(SQLException e){
+            log("Unable to connect to database");
         }
     }
 

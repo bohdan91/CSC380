@@ -24,21 +24,13 @@ public class Server {
      * @param args
      */
     public static void main(String[] args) {
-        Connection conn = null;
-        try{
-            String url = "jdbc:sqlite:" + System.getProperty("user.dir") + File.separator + "test.db";
-            conn = DriverManager.getConnection(url);
-
-            System.out.println("Connection has been established to database");
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
+        String url = "jdbc:sqlite:" + System.getProperty("user.dir") + File.separator + "test.db";
         try {
             int clientNumber = 0;
             ServerSocket listener = new ServerSocket(9898);
             try {
                 while (true) {
-                    new Service(listener.accept(), clientNumber++, conn).start();
+                    new Service(listener.accept(), clientNumber++, url).start();
                 }
             } finally {
                 listener.close();
