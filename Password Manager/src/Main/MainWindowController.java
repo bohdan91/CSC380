@@ -48,6 +48,7 @@ public class MainWindowController {
           private ObservableList<Account> data;
     @FXML private TableColumn titleColumn;
     @FXML private TableColumn userColumn;
+    @FXML private TextField searchBar;
     @FXML private TableColumn passColumn;
     @FXML private TableColumn urlColumn;
     @FXML private TableColumn noteColumn;
@@ -367,6 +368,27 @@ public class MainWindowController {
 
     }
 
+    @FXML
+    private void typeSearch(){
+        String selected = searchBar.getText();
+        data = FXCollections.observableArrayList();
+
+        if(selected != null){
+            for(Account ac : Main.accountTable.values()){
+                if(ac.getTitle().contains(selected)){
+                    data.add(ac);
+                }
+            }
+        } else {
+            for(Account ac : Main.accountTable.values()){
+                data.add(ac);
+            }
+        }
+        table.setItems(data);
+    }
+    
+
+
     /**
      * Handles event when another type is selected from the side menu
      * selects accounts with type specified and updates the table with them
@@ -386,6 +408,9 @@ public class MainWindowController {
         }
         table.setItems(data);
     }
+
+
+
 
     /**
      * Removes the selected account from table and from the server
