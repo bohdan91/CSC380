@@ -48,6 +48,7 @@ public class MainWindowController {
           private ObservableList<Account> data;
     @FXML private TableColumn titleColumn;
     @FXML private TableColumn userColumn;
+    @FXML private TextField searchBar;
     @FXML private TableColumn passColumn;
     @FXML private TableColumn urlColumn;
     @FXML private TableColumn noteColumn;
@@ -367,6 +368,27 @@ public class MainWindowController {
 
     }
 
+    @FXML
+    private void typeSearch(){
+        String selected = searchBar.getText();
+        data = FXCollections.observableArrayList();
+
+        if(selected != null){
+            for(Account ac : Main.accountTable.values()){
+                if(ac.getTitle().contains(selected)){
+                    data.add(ac);
+                }
+            }
+        } else {
+            for(Account ac : Main.accountTable.values()){
+                data.add(ac);
+            }
+        }
+        table.setItems(data);
+    }
+    
+
+
     /**
      * Handles event when another type is selected from the side menu
      * selects accounts with type specified and updates the table with them
@@ -386,6 +408,9 @@ public class MainWindowController {
         }
         table.setItems(data);
     }
+
+
+
 
     /**
      * Removes the selected account from table and from the server
@@ -455,19 +480,20 @@ public class MainWindowController {
         branchA.setExpanded(true);
         branchA_1 = makeBranch("Creating Database", branchA);
         makeBranch("- Upon first introduction, you will be prompted to create a unique 'Username'" +
-                "and 'Password'." + "\n\n" +
-                "- This creates a unique login and access to your own unique database, which will hold all" +
-                "\n" + "   'Accounts', or your specific information you wish to secure.", branchA_1);
+                   "and 'Password'." + "\n\n" +
+                   "- This creates a unique login and access to your own unique database, which will hold all" +
+                   "\n" + "   'Accounts', or your specific information you wish to secure.", branchA_1);
+        
         branchA_2 = makeBranch("Creating Accounts", branchA);
         makeBranch("- Once having access to your database, you can freely add your 'Accounts'" + "\n" +
-                "   ranging from Banking, Social, Email, Gaming, and Other " + "\n\n" +
-                "- Click 'Add Account' to be prompted to enter the specified accounts information" +
-                "\n\n" + "- This includes: " +
-                " Title - of the account (e.g. Gaming_Account_1) \n\t\t\t   Username - for the specified" +
-                "account (Gaming_User123) \n\t\t\t   Password - to be secured for the account (Gaming_password)" +
-                "\n\t\t\t   URL - of the website/etc. to be saved (gaming.com) \n\t\t\t" +
-                "   Type - type of saved password for ease of finding (gaming)" +
-                "\n\t\t\t   Notes - for any extra information you need to save (trial expires xx/xx/xxxx)" , branchA_2);
+                   "   ranging from Banking, Social, Email, Gaming, and Other " + "\n\n" +
+                   "- Click 'Add Account' to be prompted to enter the specified accounts information" +
+                   "\n\n" + "- This includes: " +
+                   " Title - of the account (e.g. Gaming_Account_1) \n\t\t\t   Username - for the specified" +
+                   " account (Gaming_User123) \n\t\t\t   Password - to be secured for the account (Gaming_password)" +
+                   "\n\t\t\t   URL - of the website/etc. to be saved (gaming.com) \n\t\t\t" +
+                   "   Type - type of saved password for ease of finding (gaming)" +
+                   "\n\t\t\t   Notes - for any extra information you need to save (trial expires xx/xx/xxxx)" , branchA_2);
 
         //branchB
         branchB = makeBranch("Maintaining Your Database", root);
@@ -475,8 +501,8 @@ public class MainWindowController {
         branchB_1 = makeBranch("Keeping Your Database Up to Date", branchB);
         makeBranch("- No need to worry, we automatically update your database once they're added", branchB_1);
         branchB_2 = makeBranch("Duplicate Accounts", branchB);
-        makeBranch("- You don't have to deal with all the clutter, as once a account or username" +
-                "\n" + "   is added, you will receive an error not allowing a duplicate", branchB_2);
+        makeBranch("- You don't have to deal with all the clutter! Once an account or username" +
+                   "\n" + "   is added, you will receive an error not allowing a duplicate", branchB_2);
 
         //branchC
         branchC = makeBranch("Features of Password Manager", root);
@@ -485,10 +511,10 @@ public class MainWindowController {
         makeBranch("- Rest assured, we encrypt all sensitive information and passwords", branchC_1);
         branchC_2 = makeBranch("Copying Usernames & Passwords", branchC);
         makeBranch("- Clicking 'Copy Username' will copy your username to the clipboard so you can " +
-                "\n   paste it where ever you'd like \n\n - Clicking 'Copy Password' will do the same, except " +
-                "a 30 second timer will start, \n   which at completion, will erase the clipboard \n\n" +
-                "- A progress bar on the bottom right of your screen will allow you to visually see " +
-                "\n   how much time you have remaining to paste your password before it is erased ", branchC_2);
+                   "\n   paste it where ever you'd like \n\n - Clicking 'Copy Password' will do the same, except " +
+                   "a 30 second timer will start, \n   which at completion, will erase the clipboard \n\n" +
+                   "- A progress bar on the bottom right of your screen will allow you to visually see " +
+                   "\n   how much time you have remaining to paste your password before it is erased ", branchC_2);
 
         //branchD
         branchD = makeBranch("Thank You!", root);
